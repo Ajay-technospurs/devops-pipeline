@@ -1,0 +1,11 @@
+.lucide {
+  color: hsla(var(--primary));
+  /* fill: hsla(var(--primary)); */
+  stroke-width: 1px;
+}
+.lucide:hover {
+  /* color: hsla(var(--primary-foreground)); */
+  /* fill: hsla(var(--primary)); */
+  stroke-width: 1.5px;
+}
+
