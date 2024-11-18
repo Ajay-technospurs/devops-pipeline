@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Navigation Tabs Component
 const NavigationTabs = () => {
   const tabs = [
     { id: "develop", label: "Develop", icon: Code },

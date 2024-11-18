@@ -3,6 +3,10 @@
   /* fill: hsla(var(--primary)); */
   stroke-width: 1px;
 }
+.lucide.foreground{
+  color: hsla(var(--primary-foreground));
+  stroke-width: 2px;
+}
 .lucide:hover {
   /* color: hsla(var(--primary-foreground)); */
   /* fill: hsla(var(--primary)); */
