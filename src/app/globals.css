@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -9,63 +9,87 @@
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 11%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 11%;
- 
-    --primary: 191 100% 41%;    /* #00ABD2 */
+
+    --primary: 191 100% 41%; /* #00ABD2 */
     --primary-foreground: 0 0% 100%;
- 
-    --secondary: 192 100% 8%;   /* #00222A */
+
+    --secondary: 192 100% 8%; /* #00222A */
     --secondary-foreground: 0 0% 100%;
- 
-    --muted: 192 100% 8%;      /* #00222A */
+
+    --muted: 192 100% 8%; /* #00222A */
     --muted-foreground: 0 0% 63.9%;
- 
-    --accent: 191 100% 41%;     /* #00ABD2 */
+
+    --accent: 191 100% 41%; /* #00ABD2 */
     --accent-foreground: 0 0% 100%;
- 
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 192 100% 8%;      /* #00222A */
-    --input: 192 100% 8%;       /* #00222A */
-    --ring: 191 100% 41%;       /* #00ABD2 */
- 
+    --border: 192 100% 8%; /* #00222A */
+    --input: 192 100% 8%; /* #00222A */
+    --ring: 191 100% 41%; /* #00ABD2 */
+
     --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
- 
+
   .dark {
-    --background: 0 0% 11%;      /* #1B1B1B */
+    --background: 0 0% 11%; /* #1B1B1B */
     --foreground: 0 0% 100%;
- 
-    --card: 192 100% 8%;        /* #00222A */
+
+    --card: 192 100% 8%; /* #00222A */
     --card-foreground: 0 0% 100%;
- 
-    --popover: 0 0% 11%;        /* #1B1B1B */
+
+    --popover: 0 0% 11%; /* #1B1B1B */
     --popover-foreground: 0 0% 100%;
- 
-    --primary: 191 100% 41%;    /* #00ABD2 */
+
+    --primary: 191 100% 41%; /* #00ABD2 */
     --primary-foreground: 0 0% 100%;
- 
-    --secondary: 192 100% 8%;   /* #00222A */
+
+    --secondary: 192 100% 8%; /* #00222A */
     --secondary-foreground: 0 0% 100%;
- 
-    --muted: 192 100% 8%;      /* #00222A */
+
+    --muted: 192 100% 8%; /* #00222A */
     --muted-foreground: 0 0% 63.9%;
- 
-    --accent: 191 100% 41%;    /* #00ABD2 */
+
+    --accent: 191 100% 41%; /* #00ABD2 */
     --accent-foreground: 0 0% 100%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
- 
-    --border: 0, 0%, 100%;     /* #00222A */
-    --input: 192 100% 8%;      /* #00222A */
-    --ring: 191 100% 41%;      /* #00ABD2 */
+
+    --border: 0, 0%, 100%; /* #00222A */
+    --input: 192 100% 8%; /* #00222A */
+    --ring: 191 100% 41%; /* #00ABD2 */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -73,4 +97,17 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+html {
+  overflow: scroll;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar {
+  height: 0;
+  width: 0; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+  background: transparent;
 }

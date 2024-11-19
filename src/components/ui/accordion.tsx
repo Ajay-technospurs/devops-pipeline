@@ -30,17 +30,18 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between py-4 text-sm font-medium text-left transition-all hover:underline",
+        "flex flex-1 items-center justify-between py-2 text-sm font-medium text-left transition-all hover:font-semibold ",
+        "data-[state=open]:bg-secondary data-[state=open]:border-l-4 data-[state=open]:border-primary data-[state=open]:text-primary",
         hasChildren
           ? "cursor-pointer [&[data-state=open]>svg]:rotate-180"
-          : "cursor-default text-muted-foreground", // Adjust UI for items without children
+          : "cursor-default ", // Adjust UI for items without children
         className
       )}
       {...(hasChildren ? props : {})} // Disable interaction for items without children
     >
       {children}
       {hasChildren && (
-        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+        <ChevronDown size={20} className="mr-2 shrink-0 text-muted-foreground transition-transform duration-200" />
       )}
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
@@ -56,7 +57,7 @@ const AccordionContent = React.forwardRef<
     className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
     {...props}
   >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+    <div className={cn("pb-2 pt-0", className)}>{children}</div>
   </AccordionPrimitive.Content>
 ));
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;
