@@ -24,11 +24,11 @@ const Header = ({ title, actionType, onActionClick }: HeaderProps) => {
 
   return (
     <div className="flex items-center justify-between w-full bg-primary text-white px-[20px] py-[2px]">
-      <h1 className="text-lg font-semibold">{title}</h1>
+      <h1 className="text-sm font-bold">{title}</h1>
       {actionType && (
         <Button
           variant="ghost"
-          // size="icon"
+          size="sm"
           onClick={onActionClick}
           className="text-white hover:bg-primary"
           data-testid="header-action-button"

@@ -21,8 +21,8 @@ const NavigationTabs = () => {
   return (
     <div className="border-b border-border">
       <div className="px-4">
-        <Tabs defaultValue="develop" className="w-full h-[48px] flex items-center">
-          <TabsList className="h-12 bg-transparent">
+        <Tabs defaultValue="develop" className="w-full h-[36px] flex items-center">
+          <TabsList className=" bg-transparent">
             {tabs.map((tab) => {
               const IconComponent = tab.icon;
               return (
@@ -30,9 +30,9 @@ const NavigationTabs = () => {
                   key={tab.id}
                   value={tab.id}
                   // data-[state=active]:bg-primary/10 data-[state=active]:text-primary
-                  className=" px-4 text-base"
+                  className=" px-4 text-sm"
                 >
-                  <IconComponent className="mr-2 h-5 w-5" />
+                  <IconComponent className="mr-2 h-4 w-4" />
                   {tab.label}
                 </TabsTrigger>
               );

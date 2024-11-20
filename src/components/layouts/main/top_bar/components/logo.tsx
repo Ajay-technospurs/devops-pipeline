@@ -7,8 +7,8 @@ const Logo = () => (
       src={logo}
       alt="logo"
     //   placeholder="blur"
-      height={36}
-      width={36}
+      height={28}
+      width={28}
     />
   </div>
 );

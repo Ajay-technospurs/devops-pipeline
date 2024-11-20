@@ -4,8 +4,8 @@ import UserProfile from "./components/user";
 
 // TopBar Component
 const TopBar = () => (
-  <div className="h-[60px] bg-secondary/90 backdrop-blur supports-[backdrop-filter]:bg-secondary/60">
-    <div className="flex h-full items-center px-4 justify-between">
+  <div className="h-[42px] bg-secondary/90 backdrop-blur supports-[backdrop-filter]:bg-secondary/60">
+    <div className="flex h-full items-center px-5 justify-between">
       <div className="flex items-center space-x-4">
         <Logo />
       </div>

@@ -13,9 +13,9 @@ const UserProfile = () => (
     <div className="px-4">
     <DropdownMenu >
       <DropdownMenuTrigger asChild >
-      <Image src={"/assets/user.svg"} alt={"settings"} width={28} height={28} />
+      <Image src={"/assets/user.svg"} alt={"settings"} width={20} height={20} />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem>Profile</DropdownMenuItem>
         {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
         <DropdownMenuSeparator />
