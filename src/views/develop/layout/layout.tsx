@@ -5,6 +5,7 @@ import PaletteSection from "../components/palettes/palettes";
 import ProjectSection from "../components/projects/projects";
 import DevelopCanvas from "../components/canvas/canvas";
 import ConfigComponent from "../components/configuration/config";
+import AttributesComponent from "../components/attributes/attributes";
 
 export default function DevelopmentLayout() {
   return (
@@ -20,6 +21,7 @@ export default function DevelopmentLayout() {
           </div>
           <div className="flex w-full">
             <ConfigComponent />
+            <AttributesComponent />
           </div>
         </div>
       </div>

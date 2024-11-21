@@ -3,13 +3,13 @@ import { useState } from "react";
 import CreateConfigDialog from "./create/create_dialog";
 import CreateAttributesDialog from "./create/create_dialog";
 
-export default function ConfigComponent() {
+export default function AttributesComponent() {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <div className="h-[40%] min-h-0 flex flex-col w-full">
+    <div className="h-[40%] min-h-0 flex flex-col w-3/5 ">
       <Header
-        title="Configuration"
+        title="Attributes"
         actionType="add"
         onActionClick={() => setOpen(true)}
       />

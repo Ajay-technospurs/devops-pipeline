@@ -39,7 +39,7 @@ export default function CreateAttributesDialog({
       
       <DialogContent className="sm:max-w-md bg-secondary">
         <DialogHeader>
-          <DialogTitle className="text-3xl text-center">New Project</DialogTitle>
+          <DialogTitle className="text-3xl text-center">New Attribute</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-[60px]">
           <div className="space-y-[20px]">
@@ -47,7 +47,7 @@ export default function CreateAttributesDialog({
               htmlFor="projectName"
               className="text-xl font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Project Name
+              Attribute Name
             </label>
             <Input
               id="projectName"
