@@ -1,7 +1,6 @@
 "use client";
 import Header from "@/components/common/header/header";
 import React, { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import {
   Accordion,
@@ -12,8 +11,9 @@ import {
 import Image from "next/image";
 import NewProjectDialog from "./create/create_dialog";
 import { Search } from "lucide-react";
+import { ProjectType } from "@/types";
 
-export default function ProjectSection() {
+export default function ProjectSection({projects}:{projects:ProjectType[]}) {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
@@ -25,7 +25,7 @@ export default function ProjectSection() {
       />
       <div className="flex-1 min-h-0">
         <SearchableDropdown
-          options={data}
+          options={projects}
           onSelect={() => console.log("select")}
         />
       </div>
@@ -34,26 +34,19 @@ export default function ProjectSection() {
   );
 }
 
-interface NestedOption {
-  label: string;
-  value: string;
-  shared?: boolean;
-  main?: boolean;
-  children?: NestedOption[];
-}
+
 
 interface SearchableDropdownProps {
-  options: NestedOption[];
+  options: ProjectType[];
   onSelect: (value: string) => void;
 }
 
 const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   options,
-  onSelect,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOptions, setFilteredOptions] =
-    useState<NestedOption[]>(options);
+    useState<ProjectType[]>(options);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -64,7 +57,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
       return;
     }
 
-    const filterOptions = (opts: NestedOption[]): NestedOption[] => {
+    const filterOptions = (opts: ProjectType[]): ProjectType[] => {
       return opts
         .map((opt) => ({
           ...opt,
@@ -81,7 +74,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     setFilteredOptions(filtered);
   };
 
-  const renderOptions = (opts: NestedOption[], childIndex: number = 1) =>
+  const renderOptions = (opts: ProjectType[], childIndex: number = 1) =>
     opts.map((opt) => (
       <AccordionItem key={opt.value} value={opt.value}>
         <AccordionTrigger
@@ -154,54 +147,4 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     </div>
   );
 };
-const data = [
-  {
-    label: "Random Name 01",
-    value: "random_name_01",
-    shared: true,
-    children: [],
-  },
-  {
-    label: "Random Name 02",
-    value: "random_name_02",
-    main: true,
-    shared: true,
-    children: [
-      {
-        label: "Random Name 01",
-        value: "random_name_01_sub",
-        children: [],
-      },
-      {
-        label: "Random Name 02",
-        value: "random_name_02_sub",
-        children: [],
-      },
-      {
-        label: "Random Name 03",
-        value: "random_name_03_sub",
-        children: [],
-      },
-    ],
-  },
-  {
-    label: "Random Name 03",
-    value: "random_name_03",
-    children: [],
-  },
-  {
-    label: "Random Name 04",
-    value: "random_name_04",
-    children: [],
-  },
-  {
-    label: "Random Name 05",
-    value: "random_name_05",
-    children: [],
-  },
-  {
-    label: "Random Name 06",
-    value: "random_name_06",
-    children: [],
-  },
-];
+

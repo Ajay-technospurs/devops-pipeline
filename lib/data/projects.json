@@ -1,0 +1,42 @@
+[
+  {
+    "id": "01",
+    "label": "Random Name 01",
+    "value": "random_name_01",
+    "shared": true,
+    "children": []
+  },
+  {
+    "id": "02",
+    "label": "Random Name 02",
+    "value": "random_name_02",
+    "main": true,
+    "shared": true,
+    "children": [
+      {
+        "id": "02-01",
+        "label": "Random Name 01",
+        "value": "random_name_01_sub",
+        "children": []
+      },
+      {
+        "id": "02-02",
+        "label": "Random Name 02",
+        "value": "random_name_02_sub",
+        "children": []
+      },
+      {
+        "id": "02-03",
+        "label": "Random Name 03",
+        "value": "random_name_03_sub",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "03",
+    "label": "Random Name 03",
+    "value": "random_name_03",
+    "children": []
+  }
+]

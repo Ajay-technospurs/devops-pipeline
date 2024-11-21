@@ -1,3 +1,4 @@
+"use client"
 import Header from "@/components/common/header/header";
 import { useEffect, useState } from "react";
 import CreateConfigDialog from "./create/create_dialog";
@@ -21,7 +22,7 @@ export default function ConfigComponent() {
   );
 }
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -94,7 +95,7 @@ const NodeDetailsForm = () => {
 
             <FormField
               name="type"
-              render={({ field }) => (
+              render={({  }) => (
                 <FormItem className="grid grid-cols-3 items-center gap-4">
                   <FormLabel className="">Type</FormLabel>
                   <Select 

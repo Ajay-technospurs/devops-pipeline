@@ -1,13 +1,12 @@
+import { FlowProvider } from "@/provider/canvas_provider";
 import { SidebarProvider } from "@/provider/sidebar_provider";
-import DevelopmentLayout from "@/views/develop/layout/layout";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <DevelopmentLayout />
-      <section>
-        {children}
-      </section>
+      <FlowProvider>
+        <section className="h-full">{children}</section>
+      </FlowProvider>
     </SidebarProvider>
   );
 }

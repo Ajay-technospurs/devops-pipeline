@@ -1,7 +1,6 @@
 "use client";
 import Header from "@/components/common/header/header";
 import React, { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import {
   Accordion,
@@ -12,6 +11,7 @@ import {
 import Image from "next/image";
 import NewProjectDialog from "./create/create_dialog";
 import { Search } from "lucide-react";
+import { PaletteType } from "@/types";
 interface NestedPaletteOption {
   label: string;
   value: string;
@@ -25,7 +25,6 @@ interface PaletteDropdownProps {
 
 const PaletteDropdown: React.FC<PaletteDropdownProps> = ({
   options,
-  onSelect,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOptions, setFilteredOptions] =
@@ -126,7 +125,7 @@ function PaletteCard( ele: NestedPaletteOption): React.JSX.Element {
     event.dataTransfer.setData("application/reactflow", dragData);
     event.dataTransfer.effectAllowed = "move";
   };
-  return <div draggable // Make the item draggable
+  return <div key={ele.label} draggable // Make the item draggable
     onDragStart={onDragStart} className="flex flex-col border items-center justify-center h-[100px] p-4">
     <Image
       style={{ marginRight: "4px" }}
@@ -140,7 +139,7 @@ function PaletteCard( ele: NestedPaletteOption): React.JSX.Element {
   </div>;
 }
 
-export default function PaletteSection() {
+export default function PaletteSection({palettes}:{palettes:PaletteType[]}) {
   const [open, setOpen] = useState<boolean>(false);
   const handleSelect = (value: string) => {
     console.log("Selected Palette Item:", value);
@@ -152,44 +151,9 @@ export default function PaletteSection() {
         actionType="add"
         onActionClick={() => setOpen(true)}
       />
-      <PaletteDropdown options={paletteOptions} onSelect={handleSelect} />
+      <PaletteDropdown options={palettes} onSelect={handleSelect} />
       <NewProjectDialog open={open} setOpen={setOpen} />
     </div>
   );
 }
-const paletteOptions: NestedPaletteOption[] = [
-  {
-    label: "AWS",
-    value: "aws",
-    icon: "aws",
-    children: [
-      {
-        label: "Dynamo DB",
-        value: "dynamo_db",
-        icon: "dynamo_db",
-      },
-      {
-        label: "EC2 Auto Scale",
-        value: "ec2_auto_scale",
-        icon: "ec2_auto_scale",
-      },
-    ],
-  },
-  {
-    label: "Azure",
-    value: "azure",
-    icon: "azure",
-    children: [
-      {
-        label: "Azure VM",
-        value: "azure_vm",
-        icon: "azure_vm",
-      },
-      {
-        label: "Azure Storage",
-        value: "azure_storage",
-        icon: "azure_storage",
-      },
-    ],
-  },
-];
+

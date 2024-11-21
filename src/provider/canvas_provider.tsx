@@ -1,3 +1,4 @@
+"use client"
 // src/components/Designer/FlowContext.tsx
 import React, {
     createContext,
@@ -209,7 +210,7 @@ import React, {
         dispatch({ type: 'SET_NODES', payload: updatedNodes });
         dispatch({ type: 'SET_EDGES', payload: updatedEdges });
       },
-      [state.nodes, state.edges]
+      [state.nodes, state.edges,setEdges,setNodes]
     );
   
     const updateNode = useCallback(
@@ -220,7 +221,7 @@ import React, {
         setNodes(updatedNodes);
         dispatch({ type: 'SET_NODES', payload: updatedNodes });
       },
-      [state.nodes]
+      [state.nodes,setNodes]
     );
   
     return (

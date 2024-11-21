@@ -1,0 +1,42 @@
+[
+  {
+    "id": "aws-01",
+    "label": "AWS",
+    "value": "aws",
+    "icon": "aws",
+    "children": [
+      {
+        "id": "aws-02",
+        "label": "Dynamo DB",
+        "value": "dynamo_db",
+        "icon": "dynamo_db"
+      },
+      {
+        "id": "aws-03",
+        "label": "EC2 Auto Scale",
+        "value": "ec2_auto_scale",
+        "icon": "ec2_auto_scale"
+      }
+    ]
+  },
+  {
+    "id": "azure-01",
+    "label": "Azure",
+    "value": "azure",
+    "icon": "azure",
+    "children": [
+      {
+        "id": "azure-02",
+        "label": "Azure VM",
+        "value": "azure_vm",
+        "icon": "azure_vm"
+      },
+      {
+        "id": "azure-03",
+        "label": "Azure Storage",
+        "value": "azure_storage",
+        "icon": "azure_storage"
+      }
+    ]
+  }
+]

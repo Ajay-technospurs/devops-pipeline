@@ -1,11 +1,9 @@
+"use client"
 import React, { useCallback, useState } from "react";
 import ReactFlow, {
   Controls,
   Background,
   type Node,
-  type Edge,
-  Connection,
-  addEdge,
   Position,
 } from "reactflow";
 import "reactflow/dist/style.css";
@@ -33,7 +31,6 @@ const DevelopCanvas: React.FC = () => {
     state,
     dispatch,
     setNodes,
-    setEdges,
     onNodesChange,
     onEdgesChange,
     onConnect,
