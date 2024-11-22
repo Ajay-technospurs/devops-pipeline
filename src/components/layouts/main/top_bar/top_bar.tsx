@@ -9,7 +9,7 @@ const TopBar = () => (
       <div className="flex items-center space-x-4">
         <Logo />
       </div>
-      <h1 className="text-lg font-bold text-foreground">Loreum Epsum</h1>
+      <h1 className="text-lg font-bold text-foreground">Devops Pipeline Management</h1>
       <div className="flex items-center  divide-x-2">
         <SettingsComponent />
         <UserProfile />

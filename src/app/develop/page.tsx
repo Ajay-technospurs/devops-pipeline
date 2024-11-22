@@ -1,10 +1,17 @@
-import { getPaletteOptions, getProjects } from "@/lib/utils/file_operations";
+export const dynamic = 'force-dynamic'
 import DevelopmentLayout from "@/views/develop/layout/layout";
-
+const fetchProjects =async ()=>{
+    const response = await fetch("http://localhost:3000/api/projects",{cache:"no-store"});
+    return await response.json()
+}
+const fetchPalettes =async ()=>{
+    const response = await fetch("http://localhost:3000/api/palettes",{cache:"no-store"});
+    return await response.json()
+}
 export default async function Page() {
     const [projects, palettes] = await Promise.all([
-        getProjects(),
-        getPaletteOptions()
+        fetchProjects(),
+        fetchPalettes()
       ]);
     return (
         <DevelopmentLayout projects={projects} palettes={palettes}  />

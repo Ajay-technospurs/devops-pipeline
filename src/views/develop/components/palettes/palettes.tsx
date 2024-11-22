@@ -61,7 +61,7 @@ const PaletteDropdown: React.FC<PaletteDropdownProps> = ({
     opts.map((opt) => (
       <AccordionItem key={opt.value} value={opt.value}>
         <AccordionTrigger
-          hasChildren={!!opt.children?.length}
+          hasChildren={opt && opt.children && opt.children.length>0}
           className={`flex items-center justify-between ${
             level > 1 ? "text-muted-foreground" : ""
           }`}
@@ -145,7 +145,7 @@ export default function PaletteSection({palettes}:{palettes:PaletteType[]}) {
     console.log("Selected Palette Item:", value);
   };
   return (
-    <div className="h-[45%] min-h-0 flex flex-col">
+    <div className=" min-h-0 flex flex-col">
       <Header
         title="Palettes"
         actionType="add"

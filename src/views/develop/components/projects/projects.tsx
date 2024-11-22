@@ -17,7 +17,7 @@ export default function ProjectSection({projects}:{projects:ProjectType[]}) {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <div className="h-[55%] min-h-0 flex flex-col">
+    <div className="min-h-0 flex flex-col">
       <Header
         title="Projects"
         actionType="add"
@@ -78,7 +78,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     opts.map((opt) => (
       <AccordionItem key={opt.value} value={opt.value}>
         <AccordionTrigger
-          hasChildren={opt.children && opt.children.length > 0}
+          hasChildren={opt && opt.children && opt.children.length>0}
           className={
             "flex items-center justify-between" +
             " " +
@@ -90,6 +90,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
               paddingLeft: `calc(12px * ${childIndex})`,
               display: "flex",
             }}
+            className="whitespace-nowrap overflow-clip"
           >
             <Image
               style={{ marginRight: "4px" }}

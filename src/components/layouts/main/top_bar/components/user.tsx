@@ -1,23 +1,28 @@
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-  } from '@/components/ui/dropdown-menu';
-import {  LogOut } from 'lucide-react';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut } from "lucide-react";
 import Image from "next/image";
 
 // User Profile Component
 const UserProfile = () => (
-    <div className="px-4">
-    <DropdownMenu >
-      <DropdownMenuTrigger asChild >
-      <Image src={"/assets/user.svg"} alt={"settings"} width={20} height={20} />
+  <div className="px-4">
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Image
+          src={"/assets/user.svg"}
+          alt={"settings"}
+          width={20}
+          height={20}
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem>Profile</DropdownMenuItem>
-        {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
+        <DropdownMenuItem>Accounts</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="mr-2 h-4 w-4" />
@@ -25,6 +30,6 @@ const UserProfile = () => (
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-    </div>
-  );
-  export default UserProfile;
+  </div>
+);
+export default UserProfile;

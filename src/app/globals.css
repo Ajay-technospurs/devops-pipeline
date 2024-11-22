@@ -16,21 +16,21 @@
     --primary: 191 100% 41%; /* #00ABD2 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 192 100% 8%; /* #00222A */
+    --secondary: 42 41% 94%; 
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 192 100% 8%; /* #00222A */
+    --muted: 192 100% 8%;
     --muted-foreground: 0 0% 63.9%;
 
-    --accent: 191 100% 41%; /* #00ABD2 */
+    --accent: 191 100% 41%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 192 100% 8%; /* #00222A */
-    --input: 192 100% 8%; /* #00222A */
-    --ring: 191 100% 41%; /* #00ABD2 */
+    --border: 210 7% 80%; /* Soft teal */
+    --input: 210 10% 90%; /* Matches border */
+    --ring: 210 7% 70%; /* Warm caramel */
 
     --radius: 0.5rem;
 
@@ -76,7 +76,7 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0, 0%, 100%; /* #00222A */
+    --border: 0, 0%, 100%, 10%; /* #00222A */
     --input: 192 100% 8%; /* #00222A */
     --ring: 191 100% 41%; /* #00ABD2 */
     --sidebar-background: 240 5.9% 10%;

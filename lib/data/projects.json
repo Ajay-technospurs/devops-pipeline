@@ -34,9 +34,21 @@
     ]
   },
   {
-    "id": "03",
-    "label": "Random Name 03",
-    "value": "random_name_03",
+    "label": "Ec2 Auto Scale",
+    "url": "https://meet-kiwi.vercel.app/campaign/optimize-campaign",
+    "main": false,
+    "shared": false,
+    "value": "Ec2 Auto Scale",
+    "id": "173b1192-9a52-4baa-987c-8aebdf13fb02",
     "children": []
+  },
+  {
+    "label": "Test",
+    "url": "https://meet-kiwi.vercel.app/campaign/optimize-campaign",
+    "main": false,
+    "shared": false,
+    "children": [],
+    "value": "Test",
+    "id": "268fdda2-0001-40fa-9c1b-b32c9130ef86"
   }
 ]

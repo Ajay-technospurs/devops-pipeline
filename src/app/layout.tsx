@@ -5,6 +5,7 @@ import "./globals.css";
 import "@/styles/icon.css"
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import MainLayout from "@/components/layouts/main/main";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default function RootLayout({
           storageKey="workflow-theme"
         >
           <MainLayout>{children}</MainLayout>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
