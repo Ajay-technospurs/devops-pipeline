@@ -1,12 +1,5 @@
 [
   {
-    "id": "01",
-    "label": "Random Name 01",
-    "value": "random_name_01",
-    "shared": true,
-    "children": []
-  },
-  {
     "id": "02",
     "label": "Random Name 02",
     "value": "random_name_02",
@@ -41,14 +34,5 @@
     "value": "Ec2 Auto Scale",
     "id": "173b1192-9a52-4baa-987c-8aebdf13fb02",
     "children": []
-  },
-  {
-    "label": "Test",
-    "url": "https://meet-kiwi.vercel.app/campaign/optimize-campaign",
-    "main": false,
-    "shared": false,
-    "children": [],
-    "value": "Test",
-    "id": "268fdda2-0001-40fa-9c1b-b32c9130ef86"
   }
 ]

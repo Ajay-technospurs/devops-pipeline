@@ -1,35 +1,52 @@
-// contexts/SidebarContext.tsx
 "use client";
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
-interface SidebarContextType {
+interface ComponentState {
   isOpen: boolean;
   toggle: () => void;
   open: () => void;
   close: () => void;
 }
 
-const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
+interface UIContextType {
+  sidebar: ComponentState;
+  configBar: ComponentState;
+  // Add other components' state management here as needed
+}
 
-export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+const UIContext = createContext<UIContextType | undefined>(undefined);
 
-  const toggle = () => setIsOpen(prev => !prev);
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
+export function UIProvider({ children }: { children: React.ReactNode }) {
+  // State management for the Sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const sidebar = {
+    isOpen: isSidebarOpen,
+    toggle: () => setIsSidebarOpen((prev) => !prev),
+    open: () => setIsSidebarOpen(true),
+    close: () => setIsSidebarOpen(false),
+  };
+
+  // State management for the ConfigBar
+  const [isConfigBarOpen, setIsConfigBarOpen] = useState(false);
+  const configBar = {
+    isOpen: isConfigBarOpen,
+    toggle: () => setIsConfigBarOpen((prev) => !prev),
+    open: () => setIsConfigBarOpen(true),
+    close: () => setIsConfigBarOpen(false),
+  };
 
   return (
-    <SidebarContext.Provider value={{ isOpen, toggle, open, close }}>
+    <UIContext.Provider value={{ sidebar, configBar }}>
       {children}
-    </SidebarContext.Provider>
+    </UIContext.Provider>
   );
 }
 
-export function useSidebar() {
-  const context = useContext(SidebarContext);
+export function useUIContext() {
+  const context = useContext(UIContext);
   if (context === undefined) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
+    throw new Error("useUIContext must be used within a UIProvider");
   }
   return context;
 }

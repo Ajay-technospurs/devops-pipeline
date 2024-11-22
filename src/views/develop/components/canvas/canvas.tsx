@@ -63,7 +63,7 @@ const DevelopCanvas: React.FC = () => {
         type: "custom",
         position,
         data: {
-          label: item.name,
+          label: item.label,
           icon: item.icon,
           id: item.id,
           type: item.type || "block",

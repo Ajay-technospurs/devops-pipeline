@@ -1,3 +1,4 @@
+"use client"
 import PaletteSection from "../components/palettes/palettes";
 import ProjectSection from "../components/projects/projects";
 import DevelopCanvas from "../components/canvas/canvas";
@@ -20,8 +21,7 @@ export default function DevelopmentLayout({
   return (
     <>
       <ResizablePanelGroup className="h-full" direction="horizontal">
-        <ResizablePanel className="h-full" defaultSize={25}>
-          {/* <div className=" border-r flex flex-col h-full"> */}
+        <ResizablePanel className="h-full" id="sidebar" defaultSize={25}>
           <ResizablePanelGroup
             className="h-full  border-r"
             direction="vertical"
@@ -30,7 +30,7 @@ export default function DevelopmentLayout({
               <ProjectSection projects={projects} />
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel className="h-full" minSize={6} maxSize={45} defaultSize={45}>
+            <ResizablePanel className="h-full"  maxSize={45} defaultSize={45}>
               <PaletteSection palettes={palettes} />
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -38,26 +38,17 @@ export default function DevelopmentLayout({
           {/* </div> */}
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={75}>
+        <ResizablePanel  defaultSize={75}>
           <ResizablePanelGroup className="h-full" direction="vertical">
             <ResizablePanel defaultSize={60}>
               <DevelopCanvas />
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel defaultSize={40} className="flex w-full min-h-0">
+            <ResizablePanel defaultSize={40}  className="flex w-full min-h-0">
               <ConfigComponent />
               <AttributesComponent />
             </ResizablePanel>
           </ResizablePanelGroup>
-          {/* <div className="flex flex-col h-full ">
-            <div className="h-[65%]">
-              <DevelopCanvas />
-            </div>
-            <div className="flex w-full h-[35%]">
-              <ConfigComponent />
-              <AttributesComponent />
-            </div>
-          </div> */}
         </ResizablePanel>
       </ResizablePanelGroup>
     </>

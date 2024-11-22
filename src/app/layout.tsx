@@ -28,7 +28,7 @@ export default function RootLayout({
           enableSystem
           storageKey="workflow-theme"
         >
-          <MainLayout>{children}</MainLayout>
+          {children}
           <Toaster />
         </ThemeProvider>
       </body>

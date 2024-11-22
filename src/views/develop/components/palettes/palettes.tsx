@@ -121,6 +121,8 @@ const PaletteDropdown: React.FC<PaletteDropdownProps> = ({
 
 function PaletteCard( ele: NestedPaletteOption): React.JSX.Element {
   const onDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    console.log(ele,"ele");
+    
     const dragData = JSON.stringify(ele); // Convert item to JSON
     event.dataTransfer.setData("application/reactflow", dragData);
     event.dataTransfer.effectAllowed = "move";
@@ -145,7 +147,7 @@ export default function PaletteSection({palettes}:{palettes:PaletteType[]}) {
     console.log("Selected Palette Item:", value);
   };
   return (
-    <div className=" min-h-0 flex flex-col">
+    <div className="h-full min-h-0 flex flex-col">
       <Header
         title="Palettes"
         actionType="add"

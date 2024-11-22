@@ -16,10 +16,10 @@ export default function AttributesComponent() {
         onActionClick={() => setOpen(true)}
       />
       <div className="flex-1 min-h-0 overflow-y-auto">
-      {[1, 1, 1, 1,1,1,1,1].map((ele, key) => {
+      {[1, 1, 1, 1,1].map((ele, key) => {
         return (
           <div key={key}className="flex border-b gap-2 px-2 py-2 items-center">
-            <Settings />
+            <Settings className="foreground" />
             <div className="text-sm">Random Attribute </div>
           </div>
         );
