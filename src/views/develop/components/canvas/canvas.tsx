@@ -5,6 +5,8 @@ import ReactFlow, {
   Background,
   type Node,
   Position,
+  ReactFlowInstance,
+  XYPosition,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import CustomNode from "./custome_node";
@@ -26,6 +28,7 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
+
 const DevelopCanvas: React.FC = () => {
   const {
     state,
@@ -35,17 +38,25 @@ const DevelopCanvas: React.FC = () => {
     onEdgesChange,
     onConnect,
   } = useFlow();
-  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
 
-  console.log(state.nodes, "nodes", state.edges);
+  const [reactFlowInstance, setReactFlowInstance] =
+    useState<ReactFlowInstance<any, any> | null>(null);
+    const [viewport, setViewport] = useState({ x: 0, y: 0, zoom: 0.8 });
+  console.log(
+    state.nodes,
+    "nodes",
+    state.edges,
+    reactFlowInstance?.getViewport(),
+    reactFlowInstance?.getZoom()
+  );
 
-  // Handle drag over
+  // Drag over handler
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
 
-  // Enhanced drop handler with flow-specific node types
+  // Drop handler
   const onDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -53,12 +64,14 @@ const DevelopCanvas: React.FC = () => {
         event.dataTransfer.getData("application/reactflow")
       );
 
-      const position = reactFlowInstance?.screenToFlowPosition({
+      if (!reactFlowInstance) return;
+
+      const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       });
 
-      let newNode: FlowNode = {
+      let newNode:any = {
         id: `${item.id}-${new Date().getTime()}`,
         type: "custom",
         position,
@@ -68,36 +81,13 @@ const DevelopCanvas: React.FC = () => {
           id: item.id,
           type: item.type || "block",
         },
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
       };
 
-      // Add specific properties based on node type
-      switch (item.type) {
-        case "branch":
-          newNode.data.condition = "";
-          newNode = {
-            ...newNode,
-            sourcePosition: Position.Right,
-            targetPosition: Position.Left,
-          };
-          break;
-        case "loop":
-          newNode.data.iterator = "";
-          break;
-        case "converge":
-          newNode = {
-            ...newNode,
-            sourcePosition: Position.Right,
-            targetPosition: Position.Left,
-          };
-          break;
-        case "simultaneous":
-          newNode = {
-            ...newNode,
-            sourcePosition: Position.Right,
-            targetPosition: Position.Left,
-          };
-          break;
-      }
+      // Add specific properties based on the node type
+      if (item.type === "branch") newNode.data.condition = "";
+      if (item.type === "loop") newNode.data.iterator = "";
 
       const updatedNodes = [...state.nodes, newNode];
       setNodes(updatedNodes);
@@ -106,6 +96,14 @@ const DevelopCanvas: React.FC = () => {
     [state.nodes, reactFlowInstance, setNodes, dispatch]
   );
 
+  // ReactFlow initialization
+  const onInit = useCallback((instance: ReactFlowInstance<any, any>) => {
+    setReactFlowInstance(instance);
+    instance.setViewport({ x: 0, y: 0, zoom: 0.8 }); // Set initial zoom level and position
+  }, [viewport]);
+  const onViewportChange = useCallback((newViewport:any) => {
+    setViewport(newViewport);
+  }, []);
   return (
     <div className="border-b h-full">
       <div className="h-full w-full" onDragOver={onDragOver} onDrop={onDrop}>
@@ -115,27 +113,26 @@ const DevelopCanvas: React.FC = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          onInit={setReactFlowInstance}
-          onNodeClick={(_, node) =>
-            dispatch({ type: "SELECT_NODE", payload: node })
-          }
-          nodeTypes={nodeTypes}
+          onInit={onInit}
+          onMove={onViewportChange}
+          minZoom={0.5} // Prevent zooming out too far
+          maxZoom={2} // Prevent zooming in too far
           snapToGrid
-          snapGrid={[15, 15]}
-          fitView
+          snapGrid={[15, 15]} // Align nodes to grid
+          nodeTypes={nodeTypes}
           defaultEdgeOptions={{
             type: "",
             animated: false,
-            
-
           }}
         >
-          <Background />
-          <Controls position={"bottom-right"} />
+          <Background gap={15} />
+          <Controls position="bottom-right" />
         </ReactFlow>
       </div>
     </div>
   );
 };
+
+
 
 export default DevelopCanvas;

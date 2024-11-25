@@ -12,6 +12,7 @@ import Image from "next/image";
 import NewProjectDialog from "./create/create_dialog";
 import { Search } from "lucide-react";
 import { PaletteType } from "@/types";
+import { InfoTooltip } from "@/components/common/info_tooltip/info_tooltip";
 interface NestedPaletteOption {
   label: string;
   value: string;
@@ -85,7 +86,7 @@ const PaletteDropdown: React.FC<PaletteDropdownProps> = ({
         </AccordionTrigger>
         {opt.children && opt.children.length > 0 && (
           <AccordionContent>
-            <div className="grid grid-cols-4 ">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(100px,102px))] ">
               {opt.children?.map((ele, index) => {
                 return (
                   PaletteCard( ele)
@@ -128,7 +129,7 @@ function PaletteCard( ele: NestedPaletteOption): React.JSX.Element {
     event.dataTransfer.effectAllowed = "move";
   };
   return <div key={ele.label} draggable // Make the item draggable
-    onDragStart={onDragStart} className="flex flex-col border items-center justify-center h-[100px] p-4">
+    onDragStart={onDragStart} className="flex flex-col border items-center justify-center h-[100px] min-w-[100px] p-4 relative">
     <Image
       style={{ marginRight: "4px" }}
       src={`/assets/palette_child.svg`}
@@ -137,6 +138,9 @@ function PaletteCard( ele: NestedPaletteOption): React.JSX.Element {
       height={40} />
     <div className="text-xs text-center">
       {ele.label}
+    </div>
+    <div className="absolute top-1 right-2">
+    <InfoTooltip content={ele.label} /> 
     </div>
   </div>;
 }

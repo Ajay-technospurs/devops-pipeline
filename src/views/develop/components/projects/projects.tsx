@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import NewProjectDialog from "./create/create_dialog";
+import ProjectFormDialog from "./create/create_dialog";
 import { Search } from "lucide-react";
 import { ProjectType } from "@/types";
 import ConfirmationDialog from "@/components/common/dialog/confirmation";
@@ -40,7 +40,7 @@ export default function ProjectSection({
           onSelect={() => console.log("select")}
         />
       </div>
-      <NewProjectDialog open={open} setOpen={setOpen} />
+      <ProjectFormDialog open={open} setOpen={setOpen} />
     </div>
   );
 }
@@ -53,6 +53,7 @@ interface ContextMenuProps {
   onMarkAsShared?: () => void;
   onMarkAsMain?: () => void;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 const ProjectContextMenu: React.FC<ContextMenuProps> = ({
@@ -63,6 +64,7 @@ const ProjectContextMenu: React.FC<ContextMenuProps> = ({
   onMarkAsShared,
   onMarkAsMain,
   onDelete,
+  onEdit,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -94,9 +96,7 @@ const ProjectContextMenu: React.FC<ContextMenuProps> = ({
           className="w-48"
           onClick={() => setShowMenu(false)}
         >
-          <DropdownMenuItem onSelect={() => console.log("edit")}>
-            Edit
-          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={onEdit}>Edit</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={onMarkAsShared} disabled={isShared}>
             Mark as shared
@@ -137,6 +137,7 @@ interface SearchableDropdownProps {
 
 const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [edit, setEdit] = useState<ProjectType | null>();
   const [filteredOptions, setFilteredOptions] =
     useState<ProjectType[]>(options);
 
@@ -180,6 +181,12 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
       window.location.reload();
     }
   };
+
+  const handleEdit = (option: ProjectType) => {
+    if (option) {
+      setEdit(option);
+    }
+  };
   const renderOptions = (opts: ProjectType[], childIndex: number = 1) =>
     opts.map((opt) => (
       <AccordionItem key={opt.value} value={opt.value}>
@@ -187,6 +194,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           isParentLevel={childIndex === 1}
           isShared={opt.shared}
           isMain={opt.main}
+          onEdit={() => handleEdit(opt)}
           onMarkAsShared={() => console.log("mark as shared", opt.value)}
           onMarkAsMain={() => console.log("mark as main", opt.value)}
           onDelete={() => handleDelete(opt.id ?? "")}
@@ -252,10 +260,23 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
         />
       </div>
       <div className="flex-1 min-h-0 overflow-hidden">
-        <Accordion type="multiple" className="h-full overflow-y-auto">
+        <Accordion
+          type="multiple"
+          className="h-full overflow-y-auto overflow-x-hidden"
+        >
           {renderOptions(filteredOptions)}
         </Accordion>
       </div>
+      <ProjectFormDialog
+        open={edit != null}
+        setOpen={(open) => {
+          if (open) {
+          } else {
+            setEdit(null);
+          }
+        }}
+        project={edit}
+      />
     </div>
   );
 };

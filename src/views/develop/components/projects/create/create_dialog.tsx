@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { ProjectType } from "@/types";
 
 // Define the schema using zod
 const projectSchema = z.object({
@@ -27,12 +28,14 @@ const projectSchema = z.object({
 // Infer the TypeScript type from the schema
 type ProjectFormData = z.infer<typeof projectSchema>;
 
-export default function NewProjectDialog({
+export default function ProjectDialog({
   open,
   setOpen,
+  project,
 }: {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  project?: ProjectType | null; // Pass existing project data for editing
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -48,38 +51,48 @@ export default function NewProjectDialog({
       url: "",
     },
   });
-  const onSubmit = async (data: ProjectFormData) => {
-    data.value = data.label;
 
+  useEffect(() => {
+    if (project) {
+      // Populate form when editing
+      reset(project);
+    }
+  }, [project, reset]);
+
+  const onSubmit = async (data: ProjectFormData) => {
     setLoading(true);
+
     try {
-      const response = await fetch("/api/projects", {
-        method: "POST",
+      const response = await fetch(project ? `/api/projects/${project.id}` : "/api/projects", {
+        method: project ? "PUT" : "POST", // Use PUT for updates, POST for creation
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": "no-cache, no-store, must-revalidate",
           Pragma: "no-cache",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, value: data.label }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create project");
+        throw new Error(`Failed to ${project ? "update" : "create"} project`);
       }
 
       const result = await response.json();
-      console.log("Project created:", result);
+      console.log(`Project ${project ? "updated" : "created"}:`, result);
+
       toast({
-        title: "Project created successfully",
+        title: `Project ${project ? "updated" : "created"} successfully`,
         description: data.label,
       });
+
       setTimeout(() => {
         window.location.reload();
       }, 2000);
+
       setOpen(false);
-      reset(); // Reset form after submission
+      reset();
     } catch (error) {
-      console.error("Error creating project:", error);
+      console.error(`Error ${project ? "updating" : "creating"} project:`, error);
     } finally {
       setLoading(false);
     }
@@ -90,7 +103,7 @@ export default function NewProjectDialog({
       <DialogContent className="sm:max-w-md bg-secondary">
         <DialogHeader>
           <DialogTitle className="text-3xl text-center">
-            New Project
+            {project ? "Edit Project" : "New Project"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-[60px]">
@@ -167,7 +180,7 @@ export default function NewProjectDialog({
               {loading ? (
                 <Loader size="sm" color="border-primary-foreground" />
               ) : (
-                "Add"
+                project ? "Update" : "Add"
               )}
             </Button>
           </div>
@@ -176,3 +189,5 @@ export default function NewProjectDialog({
     </Dialog>
   );
 }
+
+

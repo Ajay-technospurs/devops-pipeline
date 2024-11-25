@@ -3,7 +3,8 @@
 import Header from "@/components/common/header/header";
 import { useState } from "react";
 import CreateAttributesDialog from "./create/create_dialog";
-import { Settings } from "lucide-react";
+import { Search, Settings } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export default function AttributesComponent() {
   const [open, setOpen] = useState<boolean>(false);
@@ -15,6 +16,14 @@ export default function AttributesComponent() {
         actionType="add"
         onActionClick={() => setOpen(true)}
       />
+      <div className="p-2 flex-shrink-0">
+        <Input
+          placeholder="Search and select..."
+          // value={searchTerm}
+          // onChange={(e) => handleSearch(e.target.value)}
+          startIcon={<Search size={16} />}
+        />
+      </div>
       <div className="flex-1 min-h-0 overflow-y-auto">
       {[1, 1, 1, 1,1].map((ele, key) => {
         return (
