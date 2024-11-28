@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "AWSS3ListBucketBlock",
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "const": "AWSS3ListBucketBlock",
+        "description": "The type of block. This should always be 'AWSS3ListBucketBlock'."
+      },
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "connectionName": {
+            "type": "string",
+            "description": "The name of the AWS connection to use.",
+            "minLength": 1
+          },
+          "bucketARN": {
+            "type": "string",
+            "description": "The ARN of the S3 bucket to list objects from.",
+            "minLength": 1
+          },
+          "region": {
+            "type": "string",
+            "description": "The AWS region where the S3 bucket is located.",
+            "minLength": 1
+          }
+        },
+        "required": ["connectionName", "bucketARN", "region"]
+      },
+      "outputs": {
+        "type": "object",
+        "properties": {
+          "objectKeys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of object keys in the specified S3 bucket."
+          }
+        }
+      }
+    },
+    "required": ["inputs"]
+  }
+  

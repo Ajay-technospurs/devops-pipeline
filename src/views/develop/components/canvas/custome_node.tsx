@@ -1,92 +1,102 @@
-import React, { FC } from 'react';
-import { Handle, NodeProps, Position } from 'reactflow';
+import React, { FC, memo } from "react";
+import {
+  Handle,
+  NodeProps,
+  NodeTypes,
+  Position,
+  XYPosition,
+} from "@xyflow/react";
 
-interface CustomNodeData {
-  icon: React.ReactNode;
+export interface CustomNodeData {
+  icon?: React.ReactNode;
   label: string;
-  type?: 'block' | 'branch' | 'converge' | 'simultaneous' | 'loop';
+  type?: "block" | "branch" | "converge" | "simultaneous" | "loop" | "start" | "end";
   condition?: string;
   iterator?: string;
+  showHandles?: boolean;
+  schemaData?: Record<string, any>;
 }
 
-type CustomNodeProps = NodeProps<CustomNodeData>;
-
-const CustomNode: FC<CustomNodeProps> = ({ data, selected, isConnectable }) => {
-  // Determine node shape and style based on type
+const CustomNode: FC<NodeProps> = ({ data, selected }) => {
+  const nodeData: CustomNodeData = data as unknown as CustomNodeData;
   const getNodeShape = () => {
-    switch (data.type) {
-      case 'branch':
-        return 'rounded-r-lg';
-      case 'converge':
-        return 'rounded-full';
-      case 'simultaneous':
-        return 'rounded-t-lg rounded-b-lg';
-      case 'loop':
-        return 'rounded-l-lg';
-      default:
-        return 'rounded-lg';
+    switch (nodeData.type) {
+      case "branch":
+        return "transform rounded-md rotate-45 min-w-[100px] aspect-square";
+      case "converge":
+        return "rounded-full min-w-[160px] aspect-square flex items-center justify-center";
+        case "start":
+          case "end":
+          return "rounded-[100vw] min-w-[160px]";
+          default:
+            return "rounded-md min-w-[160px]";
     }
   };
 
   const getNodeStyle = () => {
-    const baseStyles = 'relative p-4 border min-w-[160px] h-[100px]';
-    const selectedStyles = selected ? 'shadow-lg shadow-primary/50' : '';
+    const baseStyles = `relative border flex items-center justify-center p-2 custom-node group`;
+    const selectedStyles = selected ? "shadow-lg shadow-primary/50" : "";
     return `${baseStyles} ${selectedStyles} bg-primary border-secondary ${getNodeShape()}`;
   };
 
   const renderNodeContent = () => {
     return (
-      <div className="flex flex-col items-center justify-between h-full">
-        <div className="text-2xl text-primary-foreground">{data.icon}</div>
-        <div className="text-sm text-primary-foreground font-medium">{data.label}</div>
-        {data.type === 'branch' && (
-          <input
-            type="text"
-            placeholder="Condition"
-            className="w-full text-xs bg-secondary/50  rounded px-2 py-1 text-primary-foreground placeholder-secondary/70"
-            value={data.condition || ''}
-            onChange={(e) => console.log('Condition changed:', e.target.value)}
-          />
+      <div
+        className={`flex flex-col items-center justify-center h-full ${
+          data?.type === "branch" ? "rotate-[-45deg]" : ""
+        }`}
+      >
+        {nodeData.icon && (
+          <div className="text-lg text-primary-foreground">{nodeData.icon}</div>
         )}
-        {data.type === 'loop' && (
-          <input
-            type="text"
-            placeholder="Iterator (item in items)"
-            className="w-full text-xs bg-secondary/50  rounded px-2 py-1 text-primary-foreground placeholder-secondary/70"
-            value={data.iterator || ''}
-            onChange={(e) => console.log('Iterator changed:', e.target.value)}
-          />
+        <div className="text-xs text-primary-foreground font-medium">
+          {nodeData.label}
+        </div>
+        {nodeData.condition && (
+          <div className="text-xs text-muted-foreground">
+            {nodeData.condition}
+          </div>
         )}
       </div>
     );
   };
 
   const renderHandles = () => {
-    const handleStyle = {
-      background: 'hsl(var(--primary-foreground))',
-      borderRadius: '0px',
-      transform: 'rotate(45deg)',
-      width: '6px',
-      height: '6px',
+    const handleStyle: React.CSSProperties = {
+      background: "hsl(var(--primary-foreground))",
+      borderRadius: "50%",
+      width: "6px",
+      height: "6px",
+      transition: "opacity 0.2s ease-in-out",
+      opacity: 0,
     };
 
-    switch (data.type) {
-      case 'branch':
+    const hoverHandleStyle: React.CSSProperties = {
+      background: "hsl(var(--primary-foreground))",
+      borderRadius: "50%",
+      width: "6px",
+      height: "6px",
+      transition: "opacity 0.2s ease-in-out",
+      opacity: 1,
+    };
+
+    switch (nodeData.type) {
+      case "branch":
         return (
           <Handle
             type="source"
             position={Position.Right}
-            style={handleStyle}
-            isConnectable={isConnectable}
+            className=""
+            style={data?.showHandles ? hoverHandleStyle : handleStyle}
           />
         );
-      case 'loop':
+      case "loop":
         return (
           <Handle
             type="target"
             position={Position.Left}
-            style={handleStyle}
-            isConnectable={isConnectable}
+            className=""
+            style={data?.showHandles ? hoverHandleStyle : handleStyle}
           />
         );
       default:
@@ -95,14 +105,14 @@ const CustomNode: FC<CustomNodeProps> = ({ data, selected, isConnectable }) => {
             <Handle
               type="target"
               position={Position.Left}
-              style={handleStyle}
-              isConnectable={isConnectable}
+              className=""
+              style={data?.showHandles ? hoverHandleStyle : handleStyle}
             />
             <Handle
               type="source"
               position={Position.Right}
-              style={handleStyle}
-              isConnectable={isConnectable}
+              className=""
+              style={data?.showHandles ? hoverHandleStyle : handleStyle}
             />
           </>
         );
@@ -117,4 +127,4 @@ const CustomNode: FC<CustomNodeProps> = ({ data, selected, isConnectable }) => {
   );
 };
 
-export default CustomNode;
+export default memo(CustomNode);

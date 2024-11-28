@@ -1,17 +1,20 @@
-"use client"
-import React, { useCallback, useState } from "react";
-import ReactFlow, {
+"use client";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ReactFlow,
   Controls,
   Background,
   type Node,
   Position,
   ReactFlowInstance,
   XYPosition,
-} from "reactflow";
-import "reactflow/dist/style.css";
+  NodeTypes,
+  Connection,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import CustomNode from "./custome_node";
 import { useFlow } from "@/provider/canvas_provider";
-
+import ButtonEdge from "./custom_edge/button_edge";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -24,11 +27,14 @@ interface FlowNode extends Node {
 }
 
 // Custom node types mapping
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   custom: CustomNode,
 };
-
-
+const edgeTypes = {
+  // bidirectional: BiDirectionalEdge,
+  // selfconnecting: SelfConnectingEdge,
+  buttonedge: ButtonEdge,
+};
 const DevelopCanvas: React.FC = () => {
   const {
     state,
@@ -37,18 +43,20 @@ const DevelopCanvas: React.FC = () => {
     onNodesChange,
     onEdgesChange,
     onConnect,
+    updateNode,
   } = useFlow();
-
-  const [reactFlowInstance, setReactFlowInstance] =
-    useState<ReactFlowInstance<any, any> | null>(null);
-    const [viewport, setViewport] = useState({ x: 0, y: 0, zoom: 0.8 });
-  console.log(
-    state.nodes,
-    "nodes",
-    state.edges,
-    reactFlowInstance?.getViewport(),
-    reactFlowInstance?.getZoom()
-  );
+  const [isConnecting, setIsConnecting] = useState(false);
+  const onConnectStart = () => setIsConnecting(true);
+  const onConnectStop = () => setIsConnecting(false);
+  useEffect(() => {
+    if (isConnecting) {
+    }
+  }, [isConnecting]);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance<
+    any,
+    any
+  > | null>(null);
+  const [viewport, setViewport] = useState({ x: 0, y: 0, zoom: 0.9 });
 
   // Drag over handler
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -71,7 +79,7 @@ const DevelopCanvas: React.FC = () => {
         y: event.clientY,
       });
 
-      let newNode:any = {
+      let newNode: any = {
         id: `${item.id}-${new Date().getTime()}`,
         type: "custom",
         position,
@@ -97,11 +105,14 @@ const DevelopCanvas: React.FC = () => {
   );
 
   // ReactFlow initialization
-  const onInit = useCallback((instance: ReactFlowInstance<any, any>) => {
-    setReactFlowInstance(instance);
-    instance.setViewport({ x: 0, y: 0, zoom: 0.8 }); // Set initial zoom level and position
-  }, [viewport]);
-  const onViewportChange = useCallback((newViewport:any) => {
+  const onInit = useCallback(
+    (instance: ReactFlowInstance<any, any>) => {
+      setReactFlowInstance(instance);
+      instance.setViewport({ x: 0, y: 0, zoom: 0.9 }); // Set initial zoom level and position
+    },
+    [viewport]
+  );
+  const onViewportChange = useCallback((newViewport: any) => {
     setViewport(newViewport);
   }, []);
   return (
@@ -112,8 +123,31 @@ const DevelopCanvas: React.FC = () => {
           edges={state.edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
+          onConnect={(connection: Connection) => {
+            onConnect(connection);
+            onConnectStop();
+          }}
+          onConnectStart={onConnectStart}
           onInit={onInit}
+          onNodeMouseEnter={(event: any, node: any) => {
+            updateNode(node.id, {
+              ...node,
+              data: { ...node.data, showHandles: true },
+            });
+            console.log(node);
+          }}
+          onNodeMouseLeave={(event: any, node: any) => {
+            // updateNode(node.id, {
+            //   ...node,
+            //   data: { ...node.data, showHandles: false },
+            // });
+          }}
+          edgeTypes={edgeTypes}
+          elevateEdgesOnSelect={true}
+          elevateNodesOnSelect={true}
+          onNodeClick={(e, node) =>
+            dispatch({ type: "SELECT_NODE", payload: node })
+          }
           onMove={onViewportChange}
           minZoom={0.5} // Prevent zooming out too far
           maxZoom={2} // Prevent zooming in too far
@@ -126,13 +160,16 @@ const DevelopCanvas: React.FC = () => {
           }}
         >
           <Background gap={15} />
-          <Controls position="bottom-right" />
+          <Controls
+            orientation="horizontal"
+            position="bottom-right"
+            style={{}}
+            className="text-black fill-black  flex !flex-row gap-2 p-2 rounded-md"
+          />
         </ReactFlow>
       </div>
     </div>
   );
 };
-
-
 
 export default DevelopCanvas;

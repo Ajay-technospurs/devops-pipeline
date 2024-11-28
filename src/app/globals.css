@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import url('./xy-theme.css');
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -127,3 +127,25 @@ html {
 .react-flow__panel.react-flow__attribution{
   display: none;
 }
+.button-edge__label {
+  position: absolute;
+  pointer-events: all;
+  transform-origin: center;
+}
+ 
+.button-edge__button {
+  width: 30px;
+  height: 30px;
+  color: red;
+  background-color: hsl(var(--secondary));
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 18px;
+  padding-top: 0px;
+  font-weight: 600;
+}
+ 
+/* .button-edge__button:hover {
+  background-color: var(--xy-theme-hover);
+  color: #ffffff;
+} */

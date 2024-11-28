@@ -23,29 +23,16 @@ export default function ConfigComponent() {
 }
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
+import Form, { IChangeEvent } from "@rjsf/core";
+import { RJSFSchema } from "@rjsf/utils";
+import validator from "@rjsf/validator-ajv8";
 
 const NodeDetailsForm = () => {
   const { state, deleteNode, updateNode, dispatch } = useFlow();
   const selectedNode = state.selectedNode;
-  const [nodeData, setNodeData] = useState<Partial<CustomNodeData>>({});
-  const form = useForm();
+  const [nodeData, setNodeData] = useState<Partial<CustomNodeData>>(selectedNode?.data??{} as CustomNodeData);
+
   // Sync the selected node's data with local state when it changes
   useEffect(() => {
     if (selectedNode) {
@@ -61,16 +48,15 @@ const NodeDetailsForm = () => {
     );
   }
 
-  // Handle input change for any field dynamically
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setNodeData((prev) => ({ ...prev, [name]: value }));
-  };
+  // Merge default node configuration with JSON Schema form data
+  const handleSubmit = (data: IChangeEvent<Record<string, any>, any, any>) => {
+    const updatedNodeData = {
+      ...nodeData,
+      schemaData: data?.formData,
+      label: data?.formData?.title || nodeData.label || "Unnamed Node",
+    };
 
-  const handleUpdateNode = () => {
-    updateNode(selectedNode.id, { data: nodeData });
+    updateNode(selectedNode.id, { data: updatedNodeData });
   };
 
   const handleDeleteNode = () => {
@@ -78,116 +64,99 @@ const NodeDetailsForm = () => {
     dispatch({ type: "SELECT_NODE", payload: null });
   };
 
+  // Default schema if no schema is provided
+  const defaultSchema: RJSFSchema = {
+    $schema: "http://json-schema.org/draft-07/schema#",
+    title: "Node Configuration",
+    type: "object",
+    properties: {
+      label: {
+        type: "string",
+        title: "Label",
+      },
+      type: {
+        type: "string",
+        title: "Type",
+        enum: ["block", "branch", "converge", "simultaneous", "loop","start","end"],
+      },
+      condition: {
+        type: "string",
+        title: "Condition",
+      },
+      iterator: {
+        type: "string",
+        title: "Iterator",
+      },
+      inputs: {
+        type: "object",
+        title: "Inputs",
+        properties: {
+          connectionName: {
+            type: "string",
+            title: "Connection Name",
+          },
+          bucketARN: {
+            type: "string",
+            title: "Bucket ARN",
+          },
+          region: {
+            type: "string",
+            title: "Region",
+          },
+        },
+        required: ["connectionName", "bucketARN", "region"],
+      },
+      outputs: {
+        type: "object",
+        title: "Outputs",
+        properties: {
+          objectKeys: {
+            type: "array",
+            title: "Object Keys",
+            items: {
+              type: "string",
+            },
+          },
+        },
+      },
+    },
+    required: ["label", "type", "inputs"],
+  };
+
   return (
     <Card className="w-full rounded-none bg-transparent h-full min-h-0 flex-1">
       <CardContent className="p-2 h-full">
-        <Form {...form} >
-          <div className="flex flex-col space-y-2 h-full">
-            {/* <div className="flex items-center justify-between">
-              <FormLabel className="text-sm">Node ID:</FormLabel>
-              <span className="text-sm text-muted-foreground">{selectedNode.id}</span>
-            </div> */}
-            <div className="flex-1 space-y-2">
-              <FormField
-                name="label"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-3 items-center gap-4">
-                    <FormLabel className="">Label</FormLabel>
-                    <FormControl className="col-span-2">
-                      <Input
-                        placeholder="Enter label"
-                        {...field}
-                        value={nodeData.label || ""}
-                        onChange={handleChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="type"
-                render={({}) => (
-                  <FormItem className="grid grid-cols-3 items-center gap-4">
-                    <FormLabel className="">Type</FormLabel>
-                    <Select
-                      onValueChange={(value: any) =>
-                        setNodeData((prev) => ({ ...prev, type: value }))
-                      }
-                      value={nodeData.type || ""}
-                    >
-                      <FormControl className="col-span-2">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select node type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="block">Block</SelectItem>
-                        <SelectItem value="branch">Branch</SelectItem>
-                        <SelectItem value="converge">Converge</SelectItem>
-                        <SelectItem value="simultaneous">
-                          Simultaneous
-                        </SelectItem>
-                        <SelectItem value="loop">Loop</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {nodeData.type === "branch" && (
-                <FormField
-                  name="condition"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-3 items-center gap-4">
-                      <FormLabel className="">Condition</FormLabel>
-                      <FormControl className="col-span-2">
-                        <Input
-                          placeholder="Enter condition"
-                          {...field}
-                          value={nodeData.condition || ""}
-                          onChange={handleChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {nodeData.type === "loop" && (
-                <FormField
-                  name="iterator"
-                  render={({ field }) => (
-                    <FormItem className="grid grid-cols-3 items-center gap-4">
-                      <FormLabel className="">Iterator</FormLabel>
-                      <FormControl className="col-span-2">
-                        <Input
-                          placeholder="Enter iterator (e.g., i++)"
-                          {...field}
-                          value={nodeData.iterator || ""}
-                          onChange={handleChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
-
-            <div className="flex space-x-2">
-              <Button onClick={handleUpdateNode} className="w-full">
-                Update
-              </Button>
-              <Button
-                onClick={handleDeleteNode}
-                variant="destructive"
-                className="w-full"
-              >
-                Delete
-              </Button>
-            </div>
+        <div className="flex flex-col space-y-2 h-full">
+          <div className="flex-1 space-y-2 min-h-0 overflow-y-auto">
+            <Form
+              schema={defaultSchema}
+              validator={validator as any}
+              formData={nodeData.schemaData || {}}
+              onSubmit={handleSubmit}
+              uiSchema={{
+                "ui:submitButtonOptions": {
+                  props: {
+                    className: "hidden", // Hide default submit button
+                  },
+                },
+              }}
+            />
           </div>
-        </Form>
+
+          <div className="flex space-x-2">
+            <Button type="submit" form="root" size={"sm"} className="w-full">
+              Update
+            </Button>
+            <Button
+            size={"sm"}
+              onClick={handleDeleteNode}
+              variant="destructive"
+              className="w-full"
+            >
+              Delete
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
