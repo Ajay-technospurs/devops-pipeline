@@ -164,6 +164,15 @@ html {
 
   white-space: nowrap; /* Prevent label text from wrapping */
 }
-.root_inputs__title{
+#root_inputs__title,#root__title{
   margin-bottom: 6px;
+}
+.panel.panel-danger.errors{
+  display: none;
+}
+.form-group > div:has(.error-detail){
+  grid-column: 2;
+  color:red;
+  font-size: 12px;
+  padding-top: 3px;
 }

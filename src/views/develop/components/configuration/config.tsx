@@ -279,6 +279,7 @@ console.log(selectedNode,"selectedNode");
                 TextWidget: CustomInputWidget,
                 SelectWidget: CustomSelectWidget,
               }}
+              // templates={{FieldErrorTemplate}}
               fields={{
                 ArrayField: CustomArrayField,
               }}

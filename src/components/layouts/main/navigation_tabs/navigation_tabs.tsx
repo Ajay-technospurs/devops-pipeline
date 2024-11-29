@@ -13,9 +13,9 @@ const NavigationTabs = () => {
     { id: "develop", label: "Develop", icon: Code },
     { id: "deploy", label: "Deploy", icon: Rocket },
     { id: "monitor", label: "Monitor", icon: LineChart },
-    { id: "tab4", label: "Tab 4", icon: Database },
-    { id: "tab5", label: "Tab 5", icon: Layout },
-    { id: "tab6", label: "Tab 6", icon: Settings },
+    // { id: "tab4", label: "Tab 4", icon: Database },
+    // { id: "tab5", label: "Tab 5", icon: Layout },
+    // { id: "tab6", label: "Tab 6", icon: Settings },
   ];
 
   return (

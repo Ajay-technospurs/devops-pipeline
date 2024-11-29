@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useRouter } from 'next/navigation';
+import { Toaster } from '@/components/ui/toaster';
+import { toast } from '@/hooks/use-toast';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -26,34 +28,65 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
+    reset,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       rememberMe: false,
     },
   });
-  const router = useRouter()
+
   const onSubmit = async (data: LoginFormValues) => {
+    setIsSubmitting(true);
+
+    // Static credentials for demo
+    const VALID_USERNAME = 'demo';
+    const VALID_PASSWORD = 'password123';
+
     try {
-      router.push("/develop")
-      // Add your login logic here
-      console.log('Form data:', data);
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      if (data.username === VALID_USERNAME && data.password === VALID_PASSWORD) {
+        toast({
+          title: "Login Successful",
+          description: "Welcome back, " + data.username + "!",
+          variant: "default",
+        });
+
+        // Reset form and redirect
+        reset();
+        router.push("/develop");
+      } else {
+        toast({
+          title: "Login Failed",
+          description: "Invalid username or password",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
-      console.error('Login error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-
   return (
-    <div className="min-h-screen flex items-center justify-center  bg-[url('/assets/login_bg.svg')] bg-cover bg-center bg-no-repeat">
+    <div className="min-h-screen flex items-center justify-center bg-[url('/assets/login_bg.svg')] bg-cover bg-center bg-no-repeat">
       <Card className="w-[400px] bg-[#001014] text-slate-100">
         <CardHeader className="space-y-2 flex flex-col items-center">
           <div className="w-8 h-8 mb-2">
-            {/* Replace with your logo import */}
             <img src="/assets/logo.svg" alt="Logo" className="w-full h-full" />
           </div>
           <CardTitle className="text-2xl font-semibold text-cyan-500">
@@ -69,7 +102,7 @@ const LoginForm = () => {
               <Input
                 id="username"
                 {...register('username')}
-                placeholder="Enter username"
+                placeholder="Enter username (hint: demo)"
                 className="bg-slate-900 border-slate-800 text-slate-100"
               />
               {errors.username && (
@@ -85,7 +118,7 @@ const LoginForm = () => {
                 id="password"
                 type="password"
                 {...register('password')}
-                placeholder="Enter password"
+                placeholder="Enter password (hint: password123)"
                 className="bg-slate-900 border-slate-800 text-slate-100"
               />
               {errors.password && (
@@ -114,6 +147,7 @@ const LoginForm = () => {
           </form>
         </CardContent>
       </Card>
+      <Toaster />
     </div>
   );
 };
