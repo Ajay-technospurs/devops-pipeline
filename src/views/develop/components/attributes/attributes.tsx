@@ -10,7 +10,7 @@ export default function AttributesComponent() {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <div className="min-h-0 flex flex-col w-3/5 ">
+    <div className="min-h-0 flex flex-col w-full">
       <Header
         title="Attributes"
         actionType="add"

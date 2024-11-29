@@ -1,6 +1,6 @@
 "use client";
 import Header from "@/components/common/header/header";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CreateConfigDialog from "./create/create_dialog";
 import { useFlow } from "@/provider/canvas_provider";
 import { CustomNodeData } from "../canvas/custome_node";
@@ -8,7 +8,7 @@ import { CustomNodeData } from "../canvas/custome_node";
 export default function ConfigComponent() {
   const [open, setOpen] = useState<boolean>(false);
   return (
-    <div className=" min-h-0 flex flex-col w-2/5 border-r">
+    <div className=" min-h-0 flex flex-col h-full border-r w-full">
       <Header
         title="Configuration"
         actionType="add"
@@ -21,17 +21,150 @@ export default function ConfigComponent() {
     </div>
   );
 }
+
+const CustomInputWidget = (props: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    props.onChange(e.target.value); // Call only when the value changes
+  };
+
+  return (
+    <Input
+      type="text"
+      value={props.value || ""}
+      onChange={handleChange}
+      placeholder={props.placeholder}
+      className="w-full"
+      onBlur={(e) => props.onBlur(e.target.value)} // To trigger validation or other effects
+    />
+  );
+};
+
+const CustomSelectWidget = (props: any) => (
+  <Select
+    value={props.value || ""}
+    onValueChange={(value) => props.onChange(value)}
+  >
+    <SelectTrigger className="w-full">
+      <SelectValue placeholder={props.placeholder} />
+    </SelectTrigger>
+    <SelectContent>
+      {props.options.enumOptions.map((option: any) => (
+        <SelectItem key={option.value} value={option.value}>
+          {option.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
+
+const CustomArrayField = (props: any) => {
+  const { formData, onChange } = props;
+
+  const handleAddClick = () => {
+    onChange([...(formData || []), ""]);
+  };
+
+  const handleRemove = (index: number) => {
+    const updatedData = [...formData];
+    updatedData.splice(index, 1);
+    onChange(updatedData);
+  };
+
+  const handleChange = (index: number, value: string) => {
+    const updatedData = [...formData];
+    updatedData[index] = value;
+    onChange(updatedData);
+  };
+
+  return (
+    <div className="space-y-2">
+      {formData?.map((item: string, index: number) => (
+        <div key={index} className="flex items-center space-x-2 pr-2">
+          <Input
+            value={item}
+            onChange={(e) => handleChange(index, e.target.value)}
+            className="flex-grow"
+          />
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            onClick={() => handleRemove(index)}
+          >
+            <X className="h-4 w-4 foreground" />
+          </Button>
+        </div>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleAddClick}
+        className="w-full"
+      >
+        <Plus className="mr-2 h-4 w-4 hover:foreground" /> Add Object Key
+      </Button>
+    </div>
+  );
+};
+
+const customUiSchema = {
+  "ui:submitButtonOptions": {
+    props: {
+      className: "hidden",
+    },
+  },
+  label: {
+    "ui:widget": "text",
+  },
+  type: {
+    "ui:widget": "select",
+  },
+  condition: {
+    "ui:widget": "text",
+  },
+  inputs: {
+    connectionName: {
+      "ui:widget": "text",
+    },
+    bucketARN: {
+      "ui:widget": "text",
+    },
+    region: {
+      "ui:widget": "text",
+    },
+  },
+  outputs: {
+    objectKeys: {
+      "ui:field": "ArrayField",
+    },
+  },
+};
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Form, { IChangeEvent } from "@rjsf/core";
 import { RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
+import { Plus, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const NodeDetailsForm = () => {
   const { state, deleteNode, updateNode, dispatch } = useFlow();
   const selectedNode = state.selectedNode;
-  const [nodeData, setNodeData] = useState<Partial<CustomNodeData>>(selectedNode?.data??{} as CustomNodeData);
+  const [nodeData, setNodeData] = useState<Partial<CustomNodeData>>(
+    selectedNode?.data ?? ({} as CustomNodeData)
+  );
+  const formRef = useRef(null);
+console.log(selectedNode,"selectedNode");
+
 
   // Sync the selected node's data with local state when it changes
   useEffect(() => {
@@ -77,7 +210,15 @@ const NodeDetailsForm = () => {
       type: {
         type: "string",
         title: "Type",
-        enum: ["block", "branch", "converge", "simultaneous", "loop","start","end"],
+        enum: [
+          "block",
+          "branch",
+          "converge",
+          "simultaneous",
+          "loop",
+          "start",
+          "end",
+        ],
       },
       condition: {
         type: "string",
@@ -122,33 +263,39 @@ const NodeDetailsForm = () => {
     },
     required: ["label", "type", "inputs"],
   };
-
   return (
     <Card className="w-full rounded-none bg-transparent h-full min-h-0 flex-1">
       <CardContent className="p-2 h-full">
         <div className="flex flex-col space-y-2 h-full">
           <div className="flex-1 space-y-2 min-h-0 overflow-y-auto">
             <Form
+            ref={formRef} 
               schema={defaultSchema}
               validator={validator as any}
-              formData={nodeData.schemaData || {}}
+              formData={nodeData?.schemaData||nodeData || {}}
               onSubmit={handleSubmit}
-              uiSchema={{
-                "ui:submitButtonOptions": {
-                  props: {
-                    className: "hidden", // Hide default submit button
-                  },
-                },
+              uiSchema={customUiSchema}
+              widgets={{
+                TextWidget: CustomInputWidget,
+                SelectWidget: CustomSelectWidget,
               }}
+              fields={{
+                ArrayField: CustomArrayField,
+              }}
+              liveValidate={false} // Reduce unnecessary validations during typing
             />
           </div>
 
           <div className="flex space-x-2">
-            <Button type="submit" form="root" size={"sm"} className="w-full">
+            <Button type="submit" onClick={() => {
+          if (formRef.current) {
+            (formRef.current as any).submit(); // Trigger form submission programmatically
+          }
+        }} size={"sm"} className="w-full">
               Update
             </Button>
             <Button
-            size={"sm"}
+              size={"sm"}
               onClick={handleDeleteNode}
               variant="destructive"
               className="w-full"
@@ -161,3 +308,4 @@ const NodeDetailsForm = () => {
     </Card>
   );
 };
+

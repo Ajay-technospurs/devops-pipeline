@@ -149,3 +149,21 @@ html {
   background-color: var(--xy-theme-hover);
   color: #ffffff;
 } */
+.react-flow__panel{
+  margin: 6px !important;
+}
+.form-group.field-string {
+  display: grid;
+  padding-right: 8px;
+  margin-bottom: 1rem; /* Adjust spacing between rows */
+  grid-template-columns: 1fr 2fr;
+}
+
+.form-group > label {
+  margin-right: 1rem; /* Adjust spacing between label and field */
+
+  white-space: nowrap; /* Prevent label text from wrapping */
+}
+.root_inputs__title{
+  margin-bottom: 6px;
+}

@@ -43,13 +43,13 @@ const initialNodes = [
     id: "start", // Unique identifier for the Start node
     type: "custom", // Input type node
     data: { label: "Start",type:"start", value: "Start", icon: <Play className="foreground" /> }, // Label for the node
-    position: { x: 50, y: 100 }, // Position on the canvas
+    position: { x: 50, y: 200 }, // Position on the canvas
   },
   {
     id: "end", // Unique identifier for the End node
     type: "custom", // Output type node
     data: { label: "End",type:"end", value: "End", icon: <MonitorStop className="foreground" /> }, // Label for the node
-    position: { x: 400, y: 100 }, // Position on the canvas
+    position: { x: 1000, y: 200 }, // Position on the canvas
   },
 ];
 // Initialize state

@@ -6,11 +6,18 @@ import {
   Position,
   XYPosition,
 } from "@xyflow/react";
-
+import Image from "next/image";
 export interface CustomNodeData {
   icon?: React.ReactNode;
   label: string;
-  type?: "block" | "branch" | "converge" | "simultaneous" | "loop" | "start" | "end";
+  type?:
+    | "block"
+    | "branch"
+    | "converge"
+    | "simultaneous"
+    | "loop"
+    | "start"
+    | "end";
   condition?: string;
   iterator?: string;
   showHandles?: boolean;
@@ -25,11 +32,11 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
         return "transform rounded-md rotate-45 min-w-[100px] aspect-square";
       case "converge":
         return "rounded-full min-w-[160px] aspect-square flex items-center justify-center";
-        case "start":
-          case "end":
-          return "rounded-[100vw] min-w-[160px]";
-          default:
-            return "rounded-md min-w-[160px]";
+      case "start":
+      case "end":
+        return "rounded-[100vw] min-w-[160px]";
+      default:
+        return "rounded-md min-w-[160px]";
     }
   };
 
@@ -46,8 +53,16 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
           data?.type === "branch" ? "rotate-[-45deg]" : ""
         }`}
       >
-        {nodeData.icon && (
+        {nodeData.icon ? (
           <div className="text-lg text-primary-foreground">{nodeData.icon}</div>
+        ) : (
+          <Image
+            style={{ marginRight: "4px" }}
+            src={`/assets/palette_child_light.svg`}
+            width={40}
+            height={40}
+            alt={nodeData.label}
+          />
         )}
         <div className="text-xs text-primary-foreground font-medium">
           {nodeData.label}

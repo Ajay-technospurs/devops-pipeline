@@ -15,6 +15,7 @@ import "@xyflow/react/dist/style.css";
 import CustomNode from "./custome_node";
 import { useFlow } from "@/provider/canvas_provider";
 import ButtonEdge from "./custom_edge/button_edge";
+import CustomControls from "./controls/custom_controls";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -85,7 +86,6 @@ const DevelopCanvas: React.FC = () => {
         position,
         data: {
           label: item.label,
-          icon: item.icon,
           id: item.id,
           type: item.type || "block",
         },
@@ -148,6 +148,8 @@ const DevelopCanvas: React.FC = () => {
           onNodeClick={(e, node) =>
             dispatch({ type: "SELECT_NODE", payload: node })
           }
+          // onClick={()=>{ dispatch({ type: "SELECT_NODE", payload: null })}}
+          
           onMove={onViewportChange}
           minZoom={0.5} // Prevent zooming out too far
           maxZoom={2} // Prevent zooming in too far
@@ -164,8 +166,13 @@ const DevelopCanvas: React.FC = () => {
             orientation="horizontal"
             position="bottom-right"
             style={{}}
-            className="text-black fill-black  flex !flex-row gap-2 p-2 rounded-md"
-          />
+            showFitView={false}
+            showInteractive={false}
+            showZoom={false}
+            className="text-black fill-black  flex !flex-row-reverse gap-2 p-1 m-1 rounded-md left-0"
+          >
+            <CustomControls />
+          </Controls>
         </ReactFlow>
       </div>
     </div>
