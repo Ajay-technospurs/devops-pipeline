@@ -47,8 +47,8 @@ const LoginForm = () => {
     setIsSubmitting(true);
 
     // Static credentials for demo
-    const VALID_USERNAME = 'demo';
-    const VALID_PASSWORD = 'password123';
+    const VALID_USERNAME = 'ajaydharmarajck@gmail.com';
+    const VALID_PASSWORD = 'NotSimple9999!';
 
     try {
       // Simulate network delay

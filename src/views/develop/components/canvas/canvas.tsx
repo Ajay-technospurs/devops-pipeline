@@ -16,6 +16,12 @@ import CustomNode from "./custome_node";
 import { useFlow } from "@/provider/canvas_provider";
 import ButtonEdge from "./custom_edge/button_edge";
 import CustomControls from "./controls/custom_controls";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import NodeSearch from "./search/nodes_search";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -116,66 +122,67 @@ const DevelopCanvas: React.FC = () => {
     setViewport(newViewport);
   }, []);
   return (
-    <div className="border-b h-full">
-      <div className="h-full w-full" onDragOver={onDragOver} onDrop={onDrop}>
-        <ReactFlow
-          nodes={state.nodes}
-          edges={state.edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={(connection: Connection) => {
-            onConnect(connection);
-            onConnectStop();
-          }}
-          onConnectStart={onConnectStart}
-          onInit={onInit}
-          onNodeMouseEnter={(event: any, node: any) => {
-            updateNode(node.id, {
-              ...node,
-              data: { ...node.data, showHandles: true },
-            });
-            console.log(node);
-          }}
-          onNodeMouseLeave={(event: any, node: any) => {
-            // updateNode(node.id, {
-            //   ...node,
-            //   data: { ...node.data, showHandles: false },
-            // });
-          }}
-          edgeTypes={edgeTypes}
-          elevateEdgesOnSelect={true}
-          elevateNodesOnSelect={true}
-          onNodeClick={(e, node) =>
-            dispatch({ type: "SELECT_NODE", payload: node })
-          }
-          // onClick={()=>{ dispatch({ type: "SELECT_NODE", payload: null })}}
-          
-          onMove={onViewportChange}
-          minZoom={0.5} // Prevent zooming out too far
-          maxZoom={2} // Prevent zooming in too far
-          snapToGrid
-          snapGrid={[15, 15]} // Align nodes to grid
-          nodeTypes={nodeTypes}
-          defaultEdgeOptions={{
-            type: "",
-            animated: false,
-          }}
-        >
-          <Background gap={15} />
-          <Controls
-            orientation="horizontal"
-            position="bottom-right"
-            style={{}}
-            showFitView={false}
-            showInteractive={false}
-            showZoom={false}
-            className="text-black fill-black  flex !flex-row-reverse gap-2 p-1 m-1 rounded-md left-0"
-          >
-            <CustomControls />
-          </Controls>
-        </ReactFlow>
-      </div>
-    </div>
+    // NodeSearch
+    <>
+      <ResizablePanelGroup className="h-full" direction="horizontal">
+        <ResizablePanel defaultSize={100}>
+          <div className="border-b h-full">
+            <div
+              className="h-full w-full"
+              onDragOver={onDragOver}
+              onDrop={onDrop}
+            >
+              <ReactFlow
+                nodes={state.nodes}
+                edges={state.edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={(connection: Connection) => {
+                  onConnect(connection);
+                  onConnectStop();
+                }}
+                onConnectStart={onConnectStart}
+                onInit={onInit}
+                edgeTypes={edgeTypes}
+                elevateEdgesOnSelect={true}
+                elevateNodesOnSelect={true}
+                onNodeClick={(e, node) =>
+                  dispatch({ type: "SELECT_NODE", payload: node })
+                }
+                // onClick={()=>{ dispatch({ type: "SELECT_NODE", payload: null })}}
+                onMove={onViewportChange}
+                minZoom={0.5} // Prevent zooming out too far
+                maxZoom={2} // Prevent zooming in too far
+                snapToGrid
+                snapGrid={[15, 15]} // Align nodes to grid
+                nodeTypes={nodeTypes}
+                defaultEdgeOptions={{
+                  type: "",
+                  animated: false,
+                }}
+              >
+                <Background gap={15} />
+                <Controls
+                  orientation="horizontal"
+                  position="bottom-right"
+                  style={{}}
+                  showFitView={false}
+                  showInteractive={false}
+                  showZoom={false}
+                  className="text-black fill-black  flex !flex-row-reverse gap-2 p-1 m-1 rounded-md left-0"
+                >
+                  <CustomControls />
+                </Controls>
+              </ReactFlow>
+            </div>
+          </div>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel defaultSize={0}>
+          <NodeSearch />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </>
   );
 };
 

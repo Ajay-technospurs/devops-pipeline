@@ -83,7 +83,7 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
       width: "6px",
       height: "6px",
       transition: "opacity 0.2s ease-in-out",
-      opacity: 0,
+      opacity: 1,
     };
 
     const hoverHandleStyle: React.CSSProperties = {

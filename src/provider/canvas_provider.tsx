@@ -17,6 +17,7 @@ import {
   Connection,
   EdgeChange,
   NodeChange,
+  MarkerType,
 } from "@xyflow/react";
 import { MonitorStop, Play } from "lucide-react";
 
@@ -150,6 +151,13 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
         source: params.source,
         target: params.target,
         type: "buttonedge",
+        deletable:true,
+        markerEnd:{
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+          // color: '#FF0072',
+        }
       };
 
       if (sourceNode?.data.type === "branch") {

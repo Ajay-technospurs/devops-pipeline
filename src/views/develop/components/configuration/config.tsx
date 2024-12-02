@@ -163,8 +163,7 @@ const NodeDetailsForm = () => {
     selectedNode?.data ?? ({} as CustomNodeData)
   );
   const formRef = useRef(null);
-console.log(selectedNode,"selectedNode");
-
+  console.log(selectedNode, "selectedNode");
 
   // Sync the selected node's data with local state when it changes
   useEffect(() => {
@@ -269,10 +268,10 @@ console.log(selectedNode,"selectedNode");
         <div className="flex flex-col space-y-2 h-full">
           <div className="flex-1 space-y-2 min-h-0 overflow-y-auto">
             <Form
-            ref={formRef} 
+              ref={formRef}
               schema={defaultSchema}
               validator={validator as any}
-              formData={nodeData?.schemaData||nodeData || {}}
+              formData={nodeData?.schemaData || nodeData || {}}
               onSubmit={handleSubmit}
               uiSchema={customUiSchema}
               widgets={{
@@ -287,26 +286,32 @@ console.log(selectedNode,"selectedNode");
             />
           </div>
 
-          <div className="flex space-x-2">
-            <Button type="submit" onClick={() => {
-          if (formRef.current) {
-            (formRef.current as any).submit(); // Trigger form submission programmatically
-          }
-        }} size={"sm"} className="w-full">
+          <div className="flex space-x-2 justify-end">
+            <Button
+              type="submit"
+              onClick={() => {
+                if (formRef.current) {
+                  (formRef.current as any).submit(); // Trigger form submission programmatically
+                }
+              }}
+              size={"sm"}
+              className=""
+            >
               Update
             </Button>
-            <Button
-              size={"sm"}
-              onClick={handleDeleteNode}
-              variant="destructive"
-              className="w-full"
-            >
-              Delete
-            </Button>
+            {selectedNode?.data?.label !== "Start" && selectedNode?.data?.label !== "End" && (
+              <Button
+                size={"sm"}
+                onClick={handleDeleteNode}
+                variant="destructive"
+                className=""
+              >
+                Delete
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
     </Card>
   );
 };
-
