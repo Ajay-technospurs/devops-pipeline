@@ -155,6 +155,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import StartNodeDetailsForm from "./start/start";
 
 const NodeDetailsForm = () => {
   const { state, deleteNode, updateNode, dispatch } = useFlow();
@@ -179,8 +180,6 @@ const NodeDetailsForm = () => {
       </div>
     );
   }
-
-  // Merge default node configuration with JSON Schema form data
   const handleSubmit = (data: IChangeEvent<Record<string, any>, any, any>) => {
     const updatedNodeData = {
       ...nodeData,
@@ -190,6 +189,10 @@ const NodeDetailsForm = () => {
 
     updateNode(selectedNode.id, { data: updatedNodeData });
   };
+  if (selectedNode?.data?.label == "Start") {
+    return <StartNodeDetailsForm handleSubmit={handleSubmit} />;
+  }
+  // Merge default node configuration with JSON Schema form data
 
   const handleDeleteNode = () => {
     deleteNode(selectedNode.id);
@@ -278,11 +281,10 @@ const NodeDetailsForm = () => {
                 TextWidget: CustomInputWidget,
                 SelectWidget: CustomSelectWidget,
               }}
-              // templates={{FieldErrorTemplate}}
               fields={{
                 ArrayField: CustomArrayField,
               }}
-              liveValidate={false} // Reduce unnecessary validations during typing
+              liveValidate={false}
             />
           </div>
 
@@ -291,7 +293,7 @@ const NodeDetailsForm = () => {
               type="submit"
               onClick={() => {
                 if (formRef.current) {
-                  (formRef.current as any).submit(); // Trigger form submission programmatically
+                  (formRef.current as any).submit();
                 }
               }}
               size={"sm"}
@@ -299,16 +301,17 @@ const NodeDetailsForm = () => {
             >
               Update
             </Button>
-            {selectedNode?.data?.label !== "Start" && selectedNode?.data?.label !== "End" && (
-              <Button
-                size={"sm"}
-                onClick={handleDeleteNode}
-                variant="destructive"
-                className=""
-              >
-                Delete
-              </Button>
-            )}
+            {selectedNode?.data?.label !== "Start" &&
+              selectedNode?.data?.label !== "End" && (
+                <Button
+                  size={"sm"}
+                  onClick={handleDeleteNode}
+                  variant="destructive"
+                  className=""
+                >
+                  Delete
+                </Button>
+              )}
           </div>
         </div>
       </CardContent>
