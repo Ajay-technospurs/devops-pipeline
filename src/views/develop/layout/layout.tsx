@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/resizable";
 import { PaletteType, ProjectType } from "@/types";
 import { usePanelRefs } from "@/provider/layout_provider";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export default function DevelopmentLayout({
   palettes,
@@ -67,6 +69,8 @@ export default function DevelopmentLayout({
             className="flex w-full min-h-0"
             ref={getPanelRef("config-panel")}
           >
+            <DndProvider backend={HTML5Backend}>
+              
             <ResizablePanelGroup className="h-full" direction="horizontal">
               <ResizablePanel
                 defaultSize={60}
@@ -84,6 +88,7 @@ export default function DevelopmentLayout({
                 <AttributesComponent />
               </ResizablePanel>
             </ResizablePanelGroup>
+            </DndProvider>
           </ResizablePanel>
         </ResizablePanelGroup>
       </ResizablePanel>

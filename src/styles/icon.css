@@ -4,6 +4,10 @@
   stroke-width: 1px;
 }
 .lucide.foreground{
+  color: hsla(var(--foreground));
+  stroke-width: 2px;
+}
+.lucide.primary-foreground{
   color: hsla(var(--primary-foreground));
   stroke-width: 2px;
 }

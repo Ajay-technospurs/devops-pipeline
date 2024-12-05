@@ -12,7 +12,7 @@ const Header = ({ title, actionType, onActionClick }: HeaderProps) => {
   const getActionIcon = () => {
     switch (actionType) {
       case 'add':
-        return <><Image src={"/assets/add_filled.svg"} alt={"add_filled_icon"} height={16} width={16} /> Add</>;
+        return <><Image src={"/assets/add_filled.svg"} alt={"add_filled_icon"} height={14} width={14} /><span className='pt-[1.5px]'>Add</span> </>;
       case 'close':
         return <X size={18} />;
       case 'info':
@@ -23,12 +23,12 @@ const Header = ({ title, actionType, onActionClick }: HeaderProps) => {
   };
 
   return (
-    <div className="flex items-center justify-between w-full bg-primary text-white px-[20px] py-[2px]">
+    <div className="flex items-center justify-between w-full bg-primary text-white px-[8px] py-[4px]">
       <h1 className="text-sm font-bold">{title}</h1>
-      {actionType && (
+      {actionType &&actionType !=="info" && (
         <Button
           variant="ghost"
-          size="sm"
+          size="xs"
           onClick={onActionClick}
           className="text-white hover:bg-primary"
           data-testid="header-action-button"

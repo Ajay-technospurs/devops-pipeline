@@ -94,6 +94,13 @@ const DevelopCanvas: React.FC = () => {
           label: item.label,
           id: item.id,
           type: item.type || "block",
+          schemaData:{
+            label: item.label,
+            id: item.id,
+            type: item.type || "block",
+            inputs:{},
+            outputs:{}
+          }
         },
         sourcePosition: Position.Right,
         targetPosition: Position.Left,

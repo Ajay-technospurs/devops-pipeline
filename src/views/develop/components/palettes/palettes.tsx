@@ -154,8 +154,8 @@ export default function PaletteSection({palettes}:{palettes:PaletteType[]}) {
     <div className="h-full min-h-0 flex flex-col">
       <Header
         title="Palettes"
-        actionType="add"
-        onActionClick={() => setOpen(true)}
+        actionType="info"
+        // onActionClick={() => setOpen(true)}
       />
       <PaletteDropdown options={palettes} onSelect={handleSelect} />
       <NewProjectDialog open={open} setOpen={setOpen} />

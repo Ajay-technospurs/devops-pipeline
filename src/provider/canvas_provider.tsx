@@ -43,13 +43,13 @@ const initialNodes = [
   {
     id: "start", // Unique identifier for the Start node
     type: "custom", // Input type node
-    data: { label: "Start",type:"start", value: "Start", icon: <Play className="foreground" /> }, // Label for the node
+    data: { id:"start",label: "Start",type:"start", value: "Start", icon: <Play className="primary-foreground" /> }, // Label for the node
     position: { x: 50, y: 200 }, // Position on the canvas
   },
   {
     id: "end", // Unique identifier for the End node
     type: "custom", // Output type node
-    data: { label: "End",type:"end", value: "End", icon: <MonitorStop className="foreground" /> }, // Label for the node
+    data: {id:"data", label: "End",type:"end", value: "End", icon: <MonitorStop className="primary-foreground" /> }, // Label for the node
     position: { x: 1000, y: 200 }, // Position on the canvas
   },
 ];
@@ -67,6 +67,7 @@ const FlowContext = createContext<{
   dispatch: Dispatch<FlowAction>;
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
+  getPreviousNodes:(nodeId:string)=>Node[],
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   deleteNode: (nodeId: string) => void;
@@ -243,7 +244,27 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
     },
     [state.nodes, setNodes]
   );
+  const getPreviousNodes = (nodeId:string):Node[] => {
+    const userNodes = nodes?.filter((ele)=>ele.id !=="start" && ele.id !=="end");
+    if(edges.length==0){
+      const currentIndex = userNodes?.findIndex((ele)=>ele.id==nodeId);
+      if(currentIndex == 0 || currentIndex==-1){
+        return []
+      }
+      return userNodes.slice(0,currentIndex)
+    }
 
+    // Filter edges where the current node is the target
+    const incomingEdges = edges.filter(edge => edge.target === nodeId);
+  
+    // Get the source IDs from the incoming edges
+    const previousNodeIds = incomingEdges.map(edge => edge.source);
+  
+    // Map the IDs to actual node objects
+    const previousNodes = userNodes.filter(node => previousNodeIds.includes(node.id));
+    
+    return previousNodes;
+  };
   return (
     <FlowContext.Provider
       value={{
@@ -256,6 +277,7 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
         onConnect,
         deleteNode,
         updateNode,
+        getPreviousNodes
       }}
     >
       {children}

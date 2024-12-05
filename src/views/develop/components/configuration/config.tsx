@@ -7,14 +7,21 @@ import { CustomNodeData } from "../canvas/custome_node";
 
 export default function ConfigComponent() {
   const [open, setOpen] = useState<boolean>(false);
+  const { state } = useFlow();
   return (
     <div className=" min-h-0 flex flex-col h-full border-r w-full">
       <Header
         title="Configuration"
-        actionType="add"
-        onActionClick={() => setOpen(true)}
+        actionType="info"
+        // onActionClick={() => setOpen(true)}
       />
-      <NodeDetailsForm />
+
+      {(state?.selectedNode?.data?.label !== "Start") &&(
+        <NodeDetailsForm />
+      )} 
+      {(state?.selectedNode?.data?.label === "Start")&& (
+        <StartNodeDetailsForm />
+      )}
       <div className="">
         <CreateConfigDialog open={open} setOpen={setOpen} />
       </div>
@@ -91,7 +98,7 @@ const CustomArrayField = (props: any) => {
             size="icon"
             onClick={() => handleRemove(index)}
           >
-            <X className="h-4 w-4 foreground" />
+            <X className="h-4 w-4 primary-foreground" />
           </Button>
         </div>
       ))}
@@ -101,7 +108,8 @@ const CustomArrayField = (props: any) => {
         onClick={handleAddClick}
         className="w-full"
       >
-        <Plus className="mr-2 h-4 w-4 hover:foreground" /> Add Object Key
+        <Plus className="mr-2 h-4 w-4 hover:primary-foreground" /> Add Object
+        Key
       </Button>
     </div>
   );
@@ -156,6 +164,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import StartNodeDetailsForm from "./start/start";
+import { useDrop } from "react-dnd";
+
+import { DRAG_TYPES, GlobalInput } from "@/types/config";
 
 const NodeDetailsForm = () => {
   const { state, deleteNode, updateNode, dispatch } = useFlow();
@@ -163,7 +174,7 @@ const NodeDetailsForm = () => {
   const [nodeData, setNodeData] = useState<Partial<CustomNodeData>>(
     selectedNode?.data ?? ({} as CustomNodeData)
   );
-  const formRef = useRef(null);
+  const formRef = useRef<Form<any>>(null);
   console.log(selectedNode, "selectedNode");
 
   // Sync the selected node's data with local state when it changes
@@ -172,7 +183,29 @@ const NodeDetailsForm = () => {
       setNodeData(selectedNode.data || {});
     }
   }, [selectedNode]);
+  const [, drop] = useDrop(() => ({
+    accept: [DRAG_TYPES.GLOBAL_INPUT],
+    drop: (item: GlobalInput) => {
+      console.log("Dropped item:", item);
 
+      setNodeData((prev) => {
+        if (item.type === "global-input") {
+          const schemaData = { ...(prev?.schemaData || { inputs: {} }) };
+      
+          schemaData.inputs = {
+            ...schemaData.inputs,
+            [item.key]: item.value,
+          };
+      
+          return {
+            ...prev,
+            schemaData,
+          };
+        }
+        return prev;
+      });
+    },
+  }));
   if (!selectedNode) {
     return (
       <div className="p-2 text-gray-500">
@@ -189,9 +222,7 @@ const NodeDetailsForm = () => {
 
     updateNode(selectedNode.id, { data: updatedNodeData });
   };
-  if (selectedNode?.data?.label == "Start") {
-    return <StartNodeDetailsForm handleSubmit={handleSubmit} />;
-  }
+
   // Merge default node configuration with JSON Schema form data
 
   const handleDeleteNode = () => {
@@ -265,8 +296,15 @@ const NodeDetailsForm = () => {
     },
     required: ["label", "type", "inputs"],
   };
+  console.log(nodeData.schemaData, "schemadata item");
+
+  
+
   return (
-    <Card className="w-full rounded-none bg-transparent h-full min-h-0 flex-1">
+    <Card
+      ref={drop as any}
+      className="w-full rounded-none bg-transparent h-full min-h-0 flex-1"
+    >
       <CardContent className="p-2 h-full">
         <div className="flex flex-col space-y-2 h-full">
           <div className="flex-1 space-y-2 min-h-0 overflow-y-auto">
@@ -274,7 +312,7 @@ const NodeDetailsForm = () => {
               ref={formRef}
               schema={defaultSchema}
               validator={validator as any}
-              formData={nodeData?.schemaData || nodeData || {}}
+              formData={nodeData?.schemaData || {}}
               onSubmit={handleSubmit}
               uiSchema={customUiSchema}
               widgets={{
