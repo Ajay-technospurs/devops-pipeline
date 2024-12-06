@@ -6,6 +6,7 @@ import {
   Maximize,
   X,
   Download,
+  SearchIcon,
 } from "lucide-react";
 import { usePanelRefs } from "@/provider/layout_provider";
 import { useFlow } from "@/provider/canvas_provider";
@@ -56,6 +57,14 @@ const CustomControls = () => {
         }}
       >
         <Download className="w-5 h-5 foreground-dark" />
+      </button>
+      <button
+        className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
+        onClick={() => {
+          expandPanel("node-search",30)
+        }}
+      >
+        <SearchIcon className="w-5 h-5 foreground-dark" />
       </button>
       <button
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/resizable";
 import NodeSearch from "./search/nodes_search";
 import NodeContextMenu from "./right_click/right_click_node";
+import { usePanelRefs } from "@/provider/layout_provider";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -159,6 +160,7 @@ const DevelopCanvas: React.FC = () => {
     },
     [reactFlowInstance]
   );
+  const { getPanelRef } = usePanelRefs();
   return (
     // NodeSearch
     <>
@@ -219,7 +221,7 @@ const DevelopCanvas: React.FC = () => {
           </div>
         </ResizablePanel>
         <ResizableHandle />
-        <ResizablePanel defaultSize={0}>
+        <ResizablePanel collapsible  collapsedSize={0} ref={getPanelRef("node-search")} defaultSize={0}>
           <NodeSearch />
         </ResizablePanel>
       </ResizablePanelGroup>

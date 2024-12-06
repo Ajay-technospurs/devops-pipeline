@@ -18,6 +18,8 @@ import {
   EdgeChange,
   NodeChange,
   MarkerType,
+  useReactFlow,
+  ReactFlowInstance,
 } from "@xyflow/react";
 import { MonitorStop, Play } from "lucide-react";
 
@@ -118,6 +120,7 @@ const flowReducer = (state: FlowState, action: FlowAction): FlowState => {
 };
 const FlowContext = createContext<{
   state: FlowState;
+  reactFlowProps:ReactFlowInstance<Node, Edge>;
   dispatch: Dispatch<FlowAction>;
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
@@ -138,7 +141,7 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(state.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(state.edges);
-
+  const reactFlowProps = useReactFlow()
   const onConnect = useCallback(
     (params: Connection) => {
       if (!params.source || !params.target) return;
@@ -403,6 +406,7 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
         updateNode,
         duplicateNode,
         getPreviousNodes,
+        reactFlowProps
         // reorderNodes,
         // findNodesByType,
         // resetFlow,
