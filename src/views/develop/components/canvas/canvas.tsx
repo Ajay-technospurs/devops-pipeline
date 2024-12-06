@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
   Controls,
@@ -22,6 +22,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import NodeSearch from "./search/nodes_search";
+import NodeContextMenu from "./right_click/right_click_node";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -50,7 +51,7 @@ const DevelopCanvas: React.FC = () => {
     onNodesChange,
     onEdgesChange,
     onConnect,
-    updateNode,
+    updateNode,deleteNode,duplicateNode
   } = useFlow();
   const [isConnecting, setIsConnecting] = useState(false);
   const onConnectStart = () => setIsConnecting(true);
@@ -94,13 +95,13 @@ const DevelopCanvas: React.FC = () => {
           label: item.label,
           id: item.id,
           type: item.type || "block",
-          schemaData:{
+          schemaData: {
             label: item.label,
             id: item.id,
             type: item.type || "block",
-            inputs:{},
-            outputs:{}
-          }
+            inputs: {},
+            outputs: {},
+          },
         },
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
@@ -128,6 +129,36 @@ const DevelopCanvas: React.FC = () => {
   const onViewportChange = useCallback((newViewport: any) => {
     setViewport(newViewport);
   }, []);
+  const ref = useRef(null);
+  const [menu, setMenu] = useState<any>(null);
+  const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      event.preventDefault();
+      if(node.id=="start" || node.id=="end") return;
+      if (!reactFlowInstance) return;
+  
+      // Get the node's bounding rectangle in the viewport
+      const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
+      
+      if (!nodeElement) return;
+  
+      // Get the node's bounding rectangle
+      const nodeRect = nodeElement.getBoundingClientRect();
+  
+      // Get the ReactFlow container's bounding rectangle
+      const flowContainer = (ref.current as any)?.getBoundingClientRect();
+  
+      setMenu({
+        node: node,
+        id: node.id,
+        top: nodeRect.top - flowContainer.top,
+        left: nodeRect.right - flowContainer.left,
+        width: 152, // or dynamically calculate
+      });
+    },
+    [reactFlowInstance]
+  );
   return (
     // NodeSearch
     <>
@@ -140,29 +171,31 @@ const DevelopCanvas: React.FC = () => {
               onDrop={onDrop}
             >
               <ReactFlow
+              ref={ref}
                 nodes={state.nodes}
                 edges={state.edges}
+                onPaneClick={onPaneClick}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={(connection: Connection) => {
                   onConnect(connection);
                   onConnectStop();
                 }}
+                onNodeContextMenu={onNodeContextMenu}
+                nodeTypes={nodeTypes}
                 onConnectStart={onConnectStart}
                 onInit={onInit}
                 edgeTypes={edgeTypes}
-                elevateEdgesOnSelect={true}
-                elevateNodesOnSelect={true}
+                elevateEdgesOnSelect={false}
+                elevateNodesOnSelect={false}
                 onNodeClick={(e, node) =>
                   dispatch({ type: "SELECT_NODE", payload: node })
                 }
-                // onClick={()=>{ dispatch({ type: "SELECT_NODE", payload: null })}}
                 onMove={onViewportChange}
                 minZoom={0.5} // Prevent zooming out too far
-                maxZoom={2} // Prevent zooming in too far
+                maxZoom={2.5} // Prevent zooming in too far
                 snapToGrid
                 snapGrid={[15, 15]} // Align nodes to grid
-                nodeTypes={nodeTypes}
                 defaultEdgeOptions={{
                   type: "",
                   animated: false,
@@ -176,10 +209,11 @@ const DevelopCanvas: React.FC = () => {
                   showFitView={false}
                   showInteractive={false}
                   showZoom={false}
-                  className="text-black fill-black  flex !flex-row-reverse gap-2 p-1 m-1 rounded-md left-0"
+                  className="flex !flex-row-reverse gap-2 p-1 m-1 rounded-md left-0"
                 >
                   <CustomControls />
                 </Controls>
+                {menu && <NodeContextMenu setMenu={setMenu} node={menu.node} onDuplicate={duplicateNode} onDelete={deleteNode} menu={menu} />}
               </ReactFlow>
             </div>
           </div>

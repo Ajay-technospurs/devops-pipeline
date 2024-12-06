@@ -10,3 +10,7 @@ export const DRAG_TYPES = {
     value: string;
     type:string
   }
+  export interface GlobalOutput{
+    objectKey:string;
+    type:string
+  }

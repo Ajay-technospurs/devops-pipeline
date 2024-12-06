@@ -52,7 +52,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ input, onDelete }) => {
 const DraggableOutputCard: React.FC<{output:string}> = ({ output }) => {
   const [{ isDragging }, drag, dragPreview] = useDrag(() => ({
     type: DRAG_TYPES.OUTPUT,
-    item: output,
+    item: {objectKey:output,type:"output"},
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -76,12 +76,11 @@ const DraggableOutputCard: React.FC<{output:string}> = ({ output }) => {
 };
 // Main Component
 export const AttributesTabsLayout: React.FC = () => {
-  const { state, updateNode, getPreviousNodes } = useFlow();
+  const { state, getPreviousNodes } = useFlow();
   const [globalInputs, setGlobalInputs] = useState<GlobalInput[]>([]);
   const [inputs, setInputs] = useState<GlobalInput[]>([]);
   const [outputs, setOutputs] = useState<string[]>([]);
 
-  console.log(globalInputs, "101");
 
   useEffect(() => {
     // Extract globalInputs from the selected node's data
@@ -127,49 +126,49 @@ export const AttributesTabsLayout: React.FC = () => {
       setInputs(input);
       setOutputs(output)
     }
-  }, [state.nodes]);
+  }, [state]);
 
   const handleDelete = (id: string) => {
     setGlobalInputs((prev) => prev.filter((input) => input.id !== id));
   };
-
+  const [tab,setTab] = useState("global");
   return (
     <Tabs
       defaultValue="global"
-      className="w-full h-full "
+      className="w-full h-full flex flex-col min-h-0"
     >
-      <TabsList className="flex w-full justify-start">
-        <TabsTrigger value="global">Global</TabsTrigger>
-        <TabsTrigger value="inputs">Inputs</TabsTrigger>
-        <TabsTrigger value="outputs">Outputs</TabsTrigger>
+      <TabsList className="flex w-full justify-start flex-shrink">
+        <TabsTrigger onClick={()=>setTab("global")} value="global">Global</TabsTrigger>
+        <TabsTrigger onClick={()=>setTab("inputs")} value="inputs">Inputs</TabsTrigger>
+        <TabsTrigger onClick={()=>setTab("outputs")} value="outputs">Outputs</TabsTrigger>
       </TabsList>
 
-      <TabsContent
-        className="flex-1 space-y-2 flex flex-col overflow-y-auto min-h-0"
+     {tab=="global"&& <TabsContent
+        className="flex-1 space-y-2 flex flex-col overflow-y-auto min-h-0 pb-4"
         value="global"
       >
         {globalInputs.map((input) => (
           <DraggableCard key={input.id} input={input} onDelete={handleDelete} />
         ))}
-      </TabsContent>
+      </TabsContent>}
 
-      <TabsContent
-        className="flex-1 space-y-2 flex flex-col overflow-y-auto min-h-0"
+      {tab=="inputs"&& <TabsContent
+        className="flex-1 space-y-2 flex flex-col overflow-y-auto min-h-0 pb-4"
         value="inputs"
       >
         {inputs.map((input) => (
           <DraggableCard key={input.id} input={input} onDelete={handleDelete} />
         ))}
-      </TabsContent>
+      </TabsContent>}
 
-      <TabsContent
-        className="flex-1 space-y-2 flex flex-col overflow-y-auto min-h-0"
+      {tab=="outputs"&&<TabsContent
+        className="flex-1 space-y-2 flex flex-col overflow-y-auto min-h-0 pb-4"
         value="outputs"
       >
         {outputs.map((output) => (
           <DraggableOutputCard key={output} output={output} />
         ))}
-      </TabsContent>
+      </TabsContent>}
     </Tabs>
   );
 };

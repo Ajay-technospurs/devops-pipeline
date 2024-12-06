@@ -62,18 +62,7 @@ const initialState: FlowState = {
   selectedNode: null,
 };
 
-const FlowContext = createContext<{
-  state: FlowState;
-  dispatch: Dispatch<FlowAction>;
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
-  getPreviousNodes:(nodeId:string)=>Node[],
-  onNodesChange: (changes: NodeChange[]) => void;
-  onEdgesChange: (changes: EdgeChange[]) => void;
-  deleteNode: (nodeId: string) => void;
-  updateNode: (nodeId: string, newData: Partial<Node>) => void;
-  onConnect: (connection: Connection) => void;
-} | null>(null);
+
 const flowReducer = (state: FlowState, action: FlowAction): FlowState => {
   switch (action.type) {
     case "SET_NODES":
@@ -127,7 +116,19 @@ const flowReducer = (state: FlowState, action: FlowAction): FlowState => {
       return state;
   }
 };
-
+const FlowContext = createContext<{
+  state: FlowState;
+  dispatch: Dispatch<FlowAction>;
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
+  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
+  getPreviousNodes:(nodeId:string)=>Node[],
+  onNodesChange: (changes: NodeChange[]) => void;
+  onEdgesChange: (changes: EdgeChange[]) => void;
+  deleteNode: (nodeId: string) => void;
+  duplicateNode: (nodeId:string) => void;
+  updateNode: (nodeId: string, newData: Partial<Node>) => void;
+  onConnect: (connection: Connection) => void;
+} | null>(null);
 interface FlowProviderProps {
   children: ReactNode;
 }
@@ -245,17 +246,17 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
     [state.nodes, setNodes]
   );
   const getPreviousNodes = (nodeId:string):Node[] => {
-    const userNodes = nodes?.filter((ele)=>ele.id !=="start" && ele.id !=="end");
+    const userNodes = state.nodes?.filter((ele)=>ele.id !=="start" && ele.id !=="end");
     if(edges.length==0){
       const currentIndex = userNodes?.findIndex((ele)=>ele.id==nodeId);
       if(currentIndex == 0 || currentIndex==-1){
         return []
       }
-      return userNodes.slice(0,currentIndex)
+      return userNodes.slice(currentIndex -1,currentIndex)
     }
 
     // Filter edges where the current node is the target
-    const incomingEdges = edges.filter(edge => edge.target === nodeId);
+    const incomingEdges = state.edges.filter(edge => edge.target === nodeId);
   
     // Get the source IDs from the incoming edges
     const previousNodeIds = incomingEdges.map(edge => edge.source);
@@ -265,6 +266,129 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
     
     return previousNodes;
   };
+
+  const duplicateNode = useCallback(
+    (nodeId: string) => {
+      const nodeToDuplicate = state.nodes.find(node => node.id === nodeId);
+      
+      if (!nodeToDuplicate) return;
+
+      // Generate a unique ID for the new node
+      const newNodeId = `${nodeToDuplicate.id}-copy-${Date.now()}`;
+
+      // Create a new node with slightly offset position
+      const duplicatedNode: Node = {
+        ...nodeToDuplicate,
+        id: newNodeId,
+        position: {
+          x: nodeToDuplicate.position.x + 100,
+          y: nodeToDuplicate.position.y + 100
+        },
+        data: {
+          ...nodeToDuplicate.data,
+          label: `${nodeToDuplicate.data.label || 'Node'}`,
+        }
+      };
+
+      // Add the new node to the existing nodes
+      const updatedNodes = [...state.nodes, duplicatedNode];
+      
+      setNodes(updatedNodes);
+      dispatch({ type: "SET_NODES", payload: updatedNodes });
+
+      return duplicatedNode;
+    },
+    [state.nodes, setNodes]
+  );
+
+  const reorderNodes = useCallback(
+    (nodeIds: string[]) => {
+      // Validate that all provided nodeIds exist
+      const validNodeIds = nodeIds.filter(id => 
+        state.nodes.some(node => node.id === id)
+      );
+
+      // Create a new array of nodes in the specified order
+      const reorderedNodes = validNodeIds.map(id => 
+        state.nodes.find(node => node.id === id)!
+      );
+
+      // Add any remaining nodes that weren't in the specified order
+      const remainingNodes = state.nodes.filter(
+        node => !validNodeIds.includes(node.id)
+      );
+
+      const updatedNodes = [...reorderedNodes, ...remainingNodes];
+      
+      setNodes(updatedNodes);
+      dispatch({ type: "SET_NODES", payload: updatedNodes });
+    },
+    [state.nodes, setNodes]
+  );
+
+  const findNodesByType = useCallback(
+    (type: string) => {
+      return state.nodes.filter(node => node.data.type === type);
+    },
+    [state.nodes]
+  );
+
+  const resetFlow = useCallback(() => {
+    // Reset to initial state, removing all user-created nodes
+    const initialNodes = state.nodes.filter(
+      node => node.id === 'start' || node.id === 'end'
+    );
+    const initialEdges: Edge[] = [];
+
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+    dispatch({ type: "SET_NODES", payload: initialNodes });
+    dispatch({ type: "SET_EDGES", payload: initialEdges });
+  }, [state.nodes, setNodes, setEdges]);
+
+  const validateFlow = useCallback(() => {
+    // Basic flow validation
+    const startNode = state.nodes.find(node => node.id === 'start');
+    const endNode = state.nodes.find(node => node.id === 'end');
+
+    // Check if there's a path from start to end
+    const hasValidPath = () => {
+      if (!startNode || !endNode) return false;
+
+      const visited = new Set<string>();
+      const queue = [startNode.id];
+
+      while (queue.length > 0) {
+        const currentNodeId = queue.shift()!;
+        
+        if (currentNodeId === endNode.id) return true;
+
+        if (visited.has(currentNodeId)) continue;
+        visited.add(currentNodeId);
+
+        // Find outgoing edges from current node
+        const outgoingEdges = state.edges.filter(
+          edge => edge.source === currentNodeId
+        );
+
+        // Add target nodes to queue
+        queue.push(
+          ...outgoingEdges.map(edge => edge.target)
+        );
+      }
+
+      return false;
+    };
+
+    return {
+      hasStart: !!startNode,
+      hasEnd: !!endNode,
+      hasValidPath: hasValidPath(),
+      nodeCount: state.nodes.length,
+      edgeCount: state.edges.length
+    };
+  }, [state.nodes, state.edges]);
+
   return (
     <FlowContext.Provider
       value={{
@@ -277,7 +401,12 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
         onConnect,
         deleteNode,
         updateNode,
-        getPreviousNodes
+        duplicateNode,
+        getPreviousNodes,
+        // reorderNodes,
+        // findNodesByType,
+        // resetFlow,
+        // validateFlow
       }}
     >
       {children}

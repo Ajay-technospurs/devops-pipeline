@@ -16,12 +16,8 @@ export default function ConfigComponent() {
         // onActionClick={() => setOpen(true)}
       />
 
-      {(state?.selectedNode?.data?.label !== "Start") &&(
-        <NodeDetailsForm />
-      )} 
-      {(state?.selectedNode?.data?.label === "Start")&& (
-        <StartNodeDetailsForm />
-      )}
+      {state?.selectedNode?.data?.label !== "Start" && <NodeDetailsForm />}
+      {state?.selectedNode?.data?.label === "Start" && <StartNodeDetailsForm />}
       <div className="">
         <CreateConfigDialog open={open} setOpen={setOpen} />
       </div>
@@ -166,7 +162,7 @@ import {
 import StartNodeDetailsForm from "./start/start";
 import { useDrop } from "react-dnd";
 
-import { DRAG_TYPES, GlobalInput } from "@/types/config";
+import { DRAG_TYPES, GlobalInput, GlobalOutput } from "@/types/config";
 
 const NodeDetailsForm = () => {
   const { state, deleteNode, updateNode, dispatch } = useFlow();
@@ -184,28 +180,45 @@ const NodeDetailsForm = () => {
     }
   }, [selectedNode]);
   const [, drop] = useDrop(() => ({
-    accept: [DRAG_TYPES.GLOBAL_INPUT],
-    drop: (item: GlobalInput) => {
+    accept: [DRAG_TYPES.GLOBAL_INPUT, DRAG_TYPES.OUTPUT],
+    drop: (item: GlobalInput | GlobalOutput) => {
       console.log("Dropped item:", item);
-
+  
       setNodeData((prev) => {
         if (item.type === "global-input") {
+          const input = item as GlobalInput;
           const schemaData = { ...(prev?.schemaData || { inputs: {} }) };
-      
+  
           schemaData.inputs = {
             ...schemaData.inputs,
-            [item.key]: item.value,
+            [input.key]: input.value,
           };
-      
+  
+          return {
+            ...prev,
+            schemaData,
+          };
+        } else if (item.type === "output") {
+          const output = item as GlobalOutput;
+          const schemaData = {
+            ...(prev?.schemaData || { outputs: { objectKeys: [] } }),
+          };
+  
+          schemaData.outputs = {
+            objectKeys: [...new Set([...schemaData.outputs.objectKeys, output.objectKey])],
+          };
+  
           return {
             ...prev,
             schemaData,
           };
         }
+  
         return prev;
       });
     },
   }));
+  
   if (!selectedNode) {
     return (
       <div className="p-2 text-gray-500">
@@ -217,7 +230,7 @@ const NodeDetailsForm = () => {
     const updatedNodeData = {
       ...nodeData,
       schemaData: data?.formData,
-      label: data?.formData?.title || nodeData.label || "Unnamed Node",
+      label: data?.formData?.label || nodeData.label || "Unnamed Node",
     };
 
     updateNode(selectedNode.id, { data: updatedNodeData });
@@ -298,8 +311,6 @@ const NodeDetailsForm = () => {
   };
   console.log(nodeData.schemaData, "schemadata item");
 
-  
-
   return (
     <Card
       ref={drop as any}
@@ -313,6 +324,12 @@ const NodeDetailsForm = () => {
               schema={defaultSchema}
               validator={validator as any}
               formData={nodeData?.schemaData || {}}
+              onChange={(data)=>{
+                setNodeData((prev)=>{
+                  prev.schemaData = data.formData
+                  return prev
+                })
+              }}
               onSubmit={handleSubmit}
               uiSchema={customUiSchema}
               widgets={{
