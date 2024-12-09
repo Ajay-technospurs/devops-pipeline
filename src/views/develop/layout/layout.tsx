@@ -43,7 +43,7 @@ export default function DevelopmentLayout({
           <ResizableHandle />
           <ResizablePanel
             className="h-full"
-            maxSize={45}
+            maxSize={95.6}
             defaultSize={45}
             collapsible={true}
             ref={getPanelRef("palette-section")}

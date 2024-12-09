@@ -60,12 +60,12 @@ const NodeContextMenu: React.FC<NodeContextMenuProps> = ({
         width: `${menu.width}px`, // Use the width you specified
         zIndex: 1000,
       }}
-      className="bg-secondary/40 border rounded-md shadow-lg overflow-hidden"
+      className="bg-popover border rounded shadow-lg overflow-hidden"
     >
       <div className="py-1">
         <button 
           onClick={handleDelete}
-          className="flex items-center w-full px-4 py-2 text-sm text-secondary-foreground hover:bg-secondary/80"
+          className="flex items-center w-full px-4 py-2 text-sm text-popover-foreground hover:bg-secondary/80"
         >
           <Trash2 className="mr-2 h-4 w-4 text-red-500" />
           Delete
@@ -74,7 +74,7 @@ const NodeContextMenu: React.FC<NodeContextMenuProps> = ({
         {onDuplicate && (
           <button 
             onClick={handleDuplicate}
-            className="flex items-center w-full px-4 py-2 text-sm text-secondary-foreground hover:bg-secondary/80"
+            className="flex items-center w-full px-4 py-2 text-sm text-popover-foreground hover:bg-secondary/80"
           >
             <Copy className="mr-2 h-4 w-4" />
             Duplicate

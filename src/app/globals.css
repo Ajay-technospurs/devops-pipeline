@@ -105,23 +105,24 @@ html {
 
 /* Customize the scrollbar */
 ::-webkit-scrollbar {
-  width: 8px; /* Smaller width */
-  height: 8px; /* Smaller height for horizontal scrollbar */
+  width: 6px; /* Smaller width */
+  height: 6px; /* Smaller height for horizontal scrollbar */
 }
 
 ::-webkit-scrollbar-track {
-  background: hsla(var(--primary-foreground)); /* Light background */
+  background:transparent; /* Light background */
   border-radius: 10px; /* Rounded corners */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: hsla(var(--primary)); /* Primary color for the thumb */
+  background-color: hsla(var(--border)); /* Primary color for the thumb */
+  opacity: 0.3;
   border-radius: 10px; /* Rounded corners */
-  border: 2px solid hsla(var(--primary-foreground)); /* Border with secondary color */
+  /* border: 2px solid hsla(var(--primary-foreground)); Border with secondary color */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: hsla(var(--secondary)); /* Secondary color on hover */
+  background-color: hsla(var(--border)); /* Secondary color on hover */
 }
 
 .react-flow__panel.react-flow__attribution{

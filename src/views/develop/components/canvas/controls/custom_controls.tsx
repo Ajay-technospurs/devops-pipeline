@@ -70,7 +70,8 @@ const CustomControls = () => {
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => fitView({duration:200})}
       >
-        <Maximize className="w-5 h-5 foreground-dark" />
+                <FullscreenIcon className="w-5 h-5 foreground-dark" />
+
       </button>
       <button
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
@@ -92,7 +93,8 @@ const CustomControls = () => {
           }, 100);
         }}
       >
-        <FullscreenIcon className="w-5 h-5 foreground-dark" />
+        <Maximize className="w-5 h-5 foreground-dark" />
+
       </button>
       <button
         className="bg-[#27282E] hover:bg-primary/20 text-xl text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
