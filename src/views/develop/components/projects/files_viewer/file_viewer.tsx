@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
 import { 
   Dialog, 
   DialogContent, 
@@ -27,13 +26,13 @@ import { Button } from "@/components/ui/button";
 import { 
   FileIcon, 
   FolderIcon, 
-  CodeIcon 
+  CopyIcon 
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import { RepositoryProvider } from '@/types/repository';
+import { SyntaxHighlighter } from './syntax_highlighter';
 
 // Interfaces for file and folder structures
 interface RepositoryItem {
@@ -57,7 +56,6 @@ interface RepositoryBrowserDialogProps {
   onFileSelect?: (filePath: string) => void;
 }
 
-// Provider-specific file fetching strategies
 const PROVIDER_STRATEGIES:any = {
   [RepositoryProvider.GITHUB]: {
     async fetchDirectoryContents(repo:any, path:string, token:string) {
@@ -86,17 +84,11 @@ const PROVIDER_STRATEGIES:any = {
           params: { ref: 'main' }
         }
       );
-      return atob(response.data.content);
-    }
-  },
-  [RepositoryProvider.GITLAB]: {
-    async fetchDirectoryContents(repo:any, path:string, token:string) {
-      // GitLab implementation would go here
-      throw new Error('GitLab support not yet implemented');
-    },
-    async fetchFileContent(repo:any, path:string, token:string) {
-      // GitLab implementation would go here
-      throw new Error('GitLab support not yet implemented');
+      if(/\.(png|jpg|jpeg|gif|bmp|webp|svg|tiff|ico)$/i.test(response.data?.path)){
+        return response.data?.content
+      }
+      
+      return atob(response.data?.content);
     }
   }
 };
@@ -115,7 +107,6 @@ export function RepositoryBrowserDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch directory contents
   const fetchContents = async (path = '') => {
     setIsLoading(true);
     setError(null);
@@ -130,8 +121,7 @@ export function RepositoryBrowserDialog({
 
       setItems(contents);
       setCurrentPath(path);
-      
-      // Update breadcrumbs
+
       const pathSegments = path.split('/').filter(Boolean);
       setBreadcrumbs(pathSegments);
     } catch (err) {
@@ -142,7 +132,6 @@ export function RepositoryBrowserDialog({
     }
   };
 
-  // Fetch file content
   const fetchFileContent = async (file: RepositoryItem) => {
     try {
       const strategy = PROVIDER_STRATEGIES[repository.provider];
@@ -158,7 +147,6 @@ export function RepositoryBrowserDialog({
     }
   };
 
-  // Navigation and interaction handlers
   const handleItemClick = (item: RepositoryItem) => {
     if (item.type === 'dir') {
       fetchContents(item.path);
@@ -172,6 +160,10 @@ export function RepositoryBrowserDialog({
     fetchContents(newPath);
   };
 
+  const handleCopyPath = () => {
+    navigator.clipboard.writeText(currentPath);
+  };
+
   const handleFileSelect = () => {
     if (selectedFile) {
       onFileSelect?.(selectedFile.path);
@@ -179,7 +171,6 @@ export function RepositoryBrowserDialog({
     }
   };
 
-  // Initial content fetch
   useEffect(() => {
     if (isOpen) {
       fetchContents(initialPath);
@@ -188,8 +179,8 @@ export function RepositoryBrowserDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-[90vw] h-[95vh] flex flex-col min-h-0 p-4 gap-2">
+        <DialogHeader className='flex-shrink'>
           <DialogTitle>
             Repository Browser - {repository.fullName}
           </DialogTitle>
@@ -198,8 +189,7 @@ export function RepositoryBrowserDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Breadcrumb Navigation */}
-        <Breadcrumb>
+        <Breadcrumb className='flex-shrink'>
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink 
@@ -222,26 +212,29 @@ export function RepositoryBrowserDialog({
                 </BreadcrumbItem>
               </React.Fragment>
             ))}
+            <Button 
+              variant="ghost" 
+              className="ml-2" 
+              onClick={handleCopyPath}
+            >
+              <CopyIcon className="h-4 w-4" />
+            </Button>
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Content Area */}
-        <div className="grid grid-cols-3 gap-4 flex-grow overflow-hidden">
-          {/* File/Folder List */}
-          <div className="col-span-1 border rounded">
-            <ScrollArea className="h-full w-full">
+        <div className="flex gap-4 flex-1 min-h-0 ">
+          <div className="min-w-[400px] border rounded  min-h-0 overflow-y-auto">
               {isLoading ? (
                 <div className="p-4 text-center">Loading...</div>
               ) : error ? (
                 <div className="p-4 text-red-500">{error}</div>
               ) : (
                 <Table>
-                  <TableHeader>
+                  {/* <TableHeader >
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
                     </TableRow>
-                  </TableHeader>
+                  </TableHeader> */}
                   <TableBody>
                     {items.map((item) => (
                       <TableRow 
@@ -252,53 +245,58 @@ export function RepositoryBrowserDialog({
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {item.type === 'dir' ? (
-                              <FolderIcon className="h-4 w-4" />
+                              <FolderIcon fill={"hsl(var(--primary-foreground))"} className="h-4 w-4 foreground" />
                             ) : (
-                              <FileIcon className="h-4 w-4" />
+                              <FileIcon className="h-4 w-4 foreground" />
                             )}
                             {item.name}
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">
-                            {item.type}
-                          </Badge>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               )}
-            </ScrollArea>
           </div>
 
-          {/* File Preview Tabs */}
-          <div className="col-span-2 border rounded">
-            <Tabs defaultValue="preview">
+          <div className="flex-1 border rounded flex flex-col min-h-0">
+            <Tabs defaultValue="preview" className='flex-1 min-h-0 flex flex-col'>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="preview">Preview</TabsTrigger>
                 <TabsTrigger value="raw">Raw</TabsTrigger>
               </TabsList>
-              <TabsContent value="preview" className="p-4">
+              <TabsContent value="preview" className="p-4 h-full flex-1 min-h-0 overflow-y-auto">
                 {selectedFile ? (
-                  <div>
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-semibold">
-                        {selectedFile.name}
-                      </h3>
-                      <Badge>{selectedFile.path}</Badge>
+                  <>
+                  <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-sm font-semibold">
+                    {selectedFile.name}
+                  </h3>
+                  <Badge>{selectedFile.path}</Badge>
+                </div>
+                  {selectedFile.content ? (
+                    /\.(png|jpg|jpeg|gif|bmp|webp|svg|tiff|ico)$/i.test(selectedFile.path) ? (
+    <img
+      src={`data:image/${selectedFile.path.split('.').pop()};base64,${selectedFile.content}`}
+      alt={selectedFile.name}
+      className="max-h-[400px] mx-auto"
+    />
+                    ) : (
+                      <SyntaxHighlighter code={selectedFile.content} fileExtension={selectedFile.path?.split(".").pop()??""} />
+                    )
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      Cannot preview this file type.
                     </div>
-                    <ScrollArea className="h-[500px] border rounded p-2">
-                      <pre className="text-sm">{selectedFile.content}</pre>
-                    </ScrollArea>
-                  </div>
+                  )}
+                  </>
                 ) : (
                   <div className="text-center text-muted-foreground">
                     Select a file to preview
                   </div>
                 )}
               </TabsContent>
-              <TabsContent value="raw" className="p-4">
+              <TabsContent value="raw" className="p-4 h-full flex-1 min-h-0 overflow-y-auto">
                 {selectedFile ? (
                   <ScrollArea className="h-[500px] border rounded p-2">
                     <code className="block whitespace-pre-wrap break-all">
@@ -312,8 +310,7 @@ export function RepositoryBrowserDialog({
                 )}
               </TabsContent>
             </Tabs>
-              
-            {/* Action Buttons */}
+
             <div className="p-4 border-t flex justify-end gap-2">
               <Button 
                 variant="outline" 
