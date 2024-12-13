@@ -13,12 +13,13 @@ import { PaletteType, ProjectType } from "@/types";
 import { usePanelRefs } from "@/provider/layout_provider";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { GitHubProjectType } from "@/mongodb/model/github";
 
 export default function DevelopmentLayout({
   palettes,
   projects,
 }: {
-  projects: ProjectType[];
+  projects: GitHubProjectType[];
   palettes: PaletteType[];
 }) {
   const { getPanelRef } = usePanelRefs();

@@ -24,14 +24,14 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ input, onDelete }) => {
   return (
     <Card
       ref={dragPreview as any}
-      className={`mb-1 mx-2 relative ${isDragging ? "opacity-50" : ""}`}
+      className={`rounded mb-1 mx-2 relative ${isDragging ? "opacity-30 border border-primary-foreground" : ""}`}
     >
       <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-2">
         <div ref={drag as any} className="cursor-move mr-2">
           <GripVertical className="text-muted-foreground" />
         </div>
-        <CardTitle className="text-sm flex-1 truncate">
-          {input.key} : {input.value}
+        <CardTitle className="text-sm flex-1 truncate ">
+          <span className="capitalize" >{input.key}</span> : {input.value}
         </CardTitle>
         {onDelete && (
           <div className="flex items-center space-x-2">
@@ -61,7 +61,7 @@ const DraggableOutputCard: React.FC<{output:string}> = ({ output }) => {
   return (
     <Card
       ref={dragPreview as any}
-      className={`mb-1 mx-2 relative ${isDragging ? "opacity-50" : ""}`}
+      className={`rounded mb-1 mx-2 relative ${isDragging ? "opacity-80 border border-primary-foreground" : ""}`}
     >
       <CardHeader className="flex flex-row items-center gap-4 space-y-0 p-2">
         <div ref={drag as any} className="cursor-move mr-2">

@@ -8,7 +8,7 @@ export function InfoTooltip({content}:{content:React.ReactNode}) {
         <TooltipTrigger>
          <InfoIcon size={10} className="foreground" />
         </TooltipTrigger>
-        <TooltipContent className="text-sm bg-primary/30">
+        <TooltipContent className="text-sm bg-primary">
           {content}
         </TooltipContent>
       </Tooltip>

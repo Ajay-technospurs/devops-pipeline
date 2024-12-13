@@ -17,13 +17,18 @@ import {
 import Image from "next/image";
 import ProjectFormDialog from "./create/create_dialog";
 import { Search } from "lucide-react";
-import { ProjectType } from "@/types";
 import ConfirmationDialog from "@/components/common/dialog/confirmation";
+import { GitHubProjectType } from "@/mongodb/model/github";
+import { ProjectCreateEdit } from "./create/tabs_form";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { RepositoryBrowserDialog } from "./files_viewer/file_viewer";
+import { RepositoryProvider } from "@/types/repository";
 
 export default function ProjectSection({
   projects,
 }: {
-  projects: ProjectType[];
+  projects: GitHubProjectType[];
 }) {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -40,7 +45,7 @@ export default function ProjectSection({
           onSelect={() => console.log("select")}
         />
       </div>
-      <ProjectFormDialog open={open} setOpen={setOpen} />
+      <ProjectCreateEdit open={open} setOpen={setOpen} />
     </div>
   );
 }
@@ -54,6 +59,7 @@ interface ContextMenuProps {
   onMarkAsMain?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  OnViewFiles?: () => void;
 }
 
 const ProjectContextMenu: React.FC<ContextMenuProps> = ({
@@ -65,6 +71,7 @@ const ProjectContextMenu: React.FC<ContextMenuProps> = ({
   onMarkAsMain,
   onDelete,
   onEdit,
+  OnViewFiles,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -104,6 +111,7 @@ const ProjectContextMenu: React.FC<ContextMenuProps> = ({
           <DropdownMenuItem onSelect={onMarkAsMain} disabled={isMain}>
             Mark as main
           </DropdownMenuItem>
+          <DropdownMenuItem onSelect={OnViewFiles}>View Files</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onSelect={handleDelete}
@@ -131,16 +139,17 @@ const ProjectContextMenu: React.FC<ContextMenuProps> = ({
 };
 
 interface SearchableDropdownProps {
-  options: ProjectType[];
+  options: GitHubProjectType[];
   onSelect: (value: string) => void;
 }
 
 const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [edit, setEdit] = useState<ProjectType | null>();
+  const [viewFiles, setViewFiles] = useState<GitHubProjectType | null>(null);
+  const [edit, setEdit] = useState<GitHubProjectType | null>();
   const [filteredOptions, setFilteredOptions] =
-    useState<ProjectType[]>(options);
-
+    useState<GitHubProjectType[]>(options);
+  const router = useRouter();
   const handleSearch = (term: string) => {
     setSearchTerm(term);
 
@@ -149,7 +158,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
       return;
     }
 
-    const filterOptions = (opts: ProjectType[]): ProjectType[] => {
+    const filterOptions = (opts: GitHubProjectType[]): GitHubProjectType[] => {
       return opts
         .map((opt) => ({
           ...opt,
@@ -157,9 +166,9 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
         }))
         .filter(
           (opt) =>
-            opt.label.toLowerCase().includes(term.toLowerCase()) ||
+            opt.name.toLowerCase().includes(term.toLowerCase()) ||
             (opt.children && opt.children.length > 0)
-        );
+        ) as GitHubProjectType[];
     };
 
     const filtered = filterOptions(options);
@@ -167,37 +176,40 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
   };
   const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/projects/${id}`, {
-        method: "DELETE",
-      });
+      const response = await axios.delete(`/api/projects?id=${id}`);
 
-      if (response.ok) {
+      if (response) {
       } else {
         console.error("Failed to delete project");
       }
     } catch (error) {
       console.error("Error deleting project:", error);
     } finally {
-      window.location.reload();
+      setTimeout(() => {
+        router.refresh();
+      }, 1000);
     }
   };
 
-  const handleEdit = (option: ProjectType) => {
+  const handleEdit = (option: GitHubProjectType) => {
     if (option) {
       setEdit(option);
     }
   };
-  const renderOptions = (opts: ProjectType[], childIndex: number = 1) =>
+  const renderOptions = (opts: GitHubProjectType[], childIndex: number = 1) =>
     opts.map((opt) => (
-      <AccordionItem key={opt.value} value={opt.value}>
+      <AccordionItem key={opt.id} value={opt.name}>
         <ProjectContextMenu
           isParentLevel={childIndex === 1}
-          isShared={opt.shared}
-          isMain={opt.main}
+          isShared={opt.isShared}
+          isMain={!opt.isShared}
           onEdit={() => handleEdit(opt)}
-          onMarkAsShared={() => console.log("mark as shared", opt.value)}
-          onMarkAsMain={() => console.log("mark as main", opt.value)}
-          onDelete={() => handleDelete(opt.id ?? "")}
+          onMarkAsShared={() => console.log("mark as shared", opt.name)}
+          onMarkAsMain={() => console.log("mark as main", opt.name)}
+          onDelete={() => handleDelete(opt._id?.toString() ?? "")}
+          OnViewFiles={() => {
+            setViewFiles(opt);
+          }}
         >
           <AccordionTrigger
             hasChildren={opt && opt.children && opt.children.length > 0}
@@ -217,23 +229,16 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
               <Image
                 style={{ marginRight: "4px" }}
                 src={`/assets/${
-                  opt.main == true && opt.shared == true
-                    ? "folder_main_shared"
-                    : opt.main
-                    ? "folder_shared"
-                    : opt.shared
-                    ? "folder_shared"
-                    : "folder"
+                  opt.isShared == true ? "folder_shared" : "folder_main_shared"
                 }.svg`}
                 alt={"folder icon"}
                 width={20}
                 height={20}
               />
-              {opt.label}
-              {opt.shared && (
+              {opt.name}
+              {opt.isShared ? (
                 <span className="ml-2 text-sm text-gray-500">(Shared)</span>
-              )}
-              {opt.main && (
+              ) : (
                 <span className="ml-2 text-sm text-primary">(Main)</span>
               )}
             </span>
@@ -267,7 +272,16 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           {renderOptions(filteredOptions)}
         </Accordion>
       </div>
-      <ProjectFormDialog
+        <RepositoryBrowserDialog
+          isOpen={viewFiles!=null}
+          onOpenChange={()=>setViewFiles(null)}
+          repository={{
+            provider: RepositoryProvider.GITHUB,
+            fullName: (viewFiles?.owner??"")+"/"+(viewFiles?.name ??""),
+            accessToken: viewFiles?.token,
+          }}
+        />
+      {/* <ProjectFormDialog
         open={edit != null}
         setOpen={(open) => {
           if (open) {
@@ -276,7 +290,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           }
         }}
         project={edit}
-      />
+      /> */}
     </div>
   );
 };
