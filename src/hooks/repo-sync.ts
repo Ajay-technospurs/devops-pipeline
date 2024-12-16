@@ -22,7 +22,8 @@ export function useRepositorySync() {
       // Sync repository to database
       const response = await axios.post('/api/projects', {
         ...validationResponse.details,
-        lastSynced: new Date()
+        lastSynced: new Date(),
+        token:repositoryData.accessToken
       });
 
       return response.data;

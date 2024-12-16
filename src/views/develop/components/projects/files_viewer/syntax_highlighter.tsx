@@ -13,6 +13,8 @@ import "prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard";
 const languageImports: Record<string, () => Promise<void>> = {
   javascript: () => import("prismjs/components/prism-javascript" as string),
   typescript: () => import("prismjs/components/prism-typescript" as string),
+  jsx: () => import("prismjs/components/prism-jsx" as string),
+  tsx: () =>import("prismjs/components/prism-tsx" as string),
   python: () => import("prismjs/components/prism-python" as string),
   json: () => import("prismjs/components/prism-json" as string),
   css: () => import("prismjs/components/prism-css" as string),
@@ -33,9 +35,9 @@ const languageImports: Record<string, () => Promise<void>> = {
 // File extension to language map
 const extensionToLanguage: Record<string, string> = {
   js: "javascript",
-  jsx: "javascript",
+  jsx: "jsx",
   ts: "typescript",
-  tsx: "typescript",
+  tsx: "tsx",
   py: "python",
   json: "json",
   css: "css",
@@ -162,6 +164,7 @@ export const SyntaxHighlighter: React.FC<SyntaxHighlighterProps> = ({
 
 // Add some additional global styles
 const styles = `
+/* Syntax Highlighter Container */
 .syntax-highlighter-container {
   position: relative;
   margin-bottom: 1rem;
@@ -169,10 +172,11 @@ const styles = `
   overflow: hidden;
 }
 
+/* Header */
 .code-block-header {
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(0, 0, 0, 0.05);
   padding: 8px 12px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -180,18 +184,45 @@ const styles = `
 
 .code-block-title {
   font-size: 0.9rem;
-  color: rgba(0,0,0,0.7);
+  color: rgba(0, 0, 0, 0.7);
   font-weight: 500;
 }
 
+/* Code Block */
 .code-block {
   transition: all 0.3s ease;
 }
 
 .code-block:hover {
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Copy Button */
+.prism-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 6px 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 8px 8px;
+}
+
+.prism-toolbar-item {
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #007acc;
+  background-color: transparent;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.prism-toolbar-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 `;
+
 
 // Inject styles
 if (typeof window !== 'undefined') {

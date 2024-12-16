@@ -45,7 +45,7 @@ export function ProjectCreateEdit({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg bg-secondary">
       <DialogHeader>
           <DialogTitle className="text-3xl text-start">
             {"New Project"}

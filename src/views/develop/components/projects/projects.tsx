@@ -197,7 +197,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
     }
   };
   const renderOptions = (opts: GitHubProjectType[], childIndex: number = 1) =>
-    opts.map((opt) => (
+    opts?.map((opt) => (
       <AccordionItem key={opt.id} value={opt.name}>
         <ProjectContextMenu
           isParentLevel={childIndex === 1}
@@ -209,7 +209,10 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           onDelete={() => handleDelete(opt._id?.toString() ?? "")}
           OnViewFiles={() => {
             setViewFiles(opt);
+            console.log(opt,"what");
+            
           }}
+          
         >
           <AccordionTrigger
             hasChildren={opt && opt.children && opt.children.length > 0}
@@ -247,7 +250,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
         {opt.children && opt.children.length > 0 && (
           <AccordionContent>
             <div className="">
-              {renderOptions(opt.children, childIndex + 1)}
+              {opt&&renderOptions(opt.children, childIndex + 1)}
             </div>
           </AccordionContent>
         )}
