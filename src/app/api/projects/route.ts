@@ -1,5 +1,4 @@
 // app/api/projects/route.ts
-import { NextApiRequest, NextApiResponse } from 'next/types';
 import mongoose from 'mongoose';
 import { Projects } from '@/mongodb/model/github';
 import { NextRequest } from 'next/server';
@@ -38,7 +37,7 @@ export const revalidate = 0; // Disable cache
 //   }
 // }
 
-const connectDB = async () => {
+export const connectDB = async () => {
   if (mongoose.connections[0].readyState) return;
   console.log(process.env.MONGODB_URI,"process.env.MONGODB_URI");
   
@@ -78,15 +77,6 @@ export async function POST(request: Request) {
     if (existingRepo) {
       return  Response.json({ error: 'Projects already exists' });
     }
-
-    // const newRepository = new Projects({
-    //   owner:owner.login,
-    //   name,
-    //   url:html_url,
-    //   token: visibility=="private" ? token : undefined,
-    //   isPrivate:visibility=="private",
-    // });
-    // console.log(newRepository,"new repo");
     const newRepository =await Projects.create({
       owner:owner.login,
       name,

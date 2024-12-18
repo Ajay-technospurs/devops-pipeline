@@ -206,7 +206,11 @@ const styles = `
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 0 0 8px 8px;
 }
-
+.copy-to-clipboard-button{
+  height:24px;
+  width:60px;
+  border-radius:4px !important;
+}
 .prism-toolbar-item {
   cursor: pointer;
   font-size: 0.8rem;

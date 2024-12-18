@@ -46,17 +46,20 @@ interface RepositoryBrowserDialogProps {
   repository: {
     provider: RepositoryProvider;
     fullName: string;
+    owner: string;
+    name: string;
     accessToken?: string;
   };
   initialPath?: string;
   onFileSelect?: (filePath: string) => void;
+  isPush?:boolean
 }
 
 const PROVIDER_STRATEGIES: any = {
   [RepositoryProvider.GITHUB]: {
     async fetchDirectoryContents(repo: any, path: string, token: string) {
       const response = await axios.get(
-        `https://api.github.com/repos/${repo.fullName}/contents/${path || ""}`,
+        `https://api.github.com/repos/${repo.fullName??(repo.owner+"/"+repo.name)}/contents/${path || ""}`,
         {
           headers: token ? { Authorization: `token ${token}` } : {},
         }
@@ -70,7 +73,7 @@ const PROVIDER_STRATEGIES: any = {
     },
     async fetchFileContent(repo: any, path: string, token: string) {
       const response = await axios.get(
-        `https://api.github.com/repos/${repo.fullName}/contents/${path}`,
+        `https://api.github.com/repos/${repo.fullName??(repo.owner+"/"+repo.name)}/contents/${path}`,
         {
           headers: token ? { Authorization: `token ${token}` } : {},
           params: { ref: "main" },
@@ -92,7 +95,7 @@ export function RepositoryBrowserDialog({
   onOpenChange,
   repository,
   initialPath,
-  onFileSelect,
+  onFileSelect,isPush=false
 }: RepositoryBrowserDialogProps) {
   const [currentPath, setCurrentPath] = useState(initialPath || "");
   const [items, setItems] = useState<RepositoryItem[]>([]);
@@ -161,7 +164,10 @@ export function RepositoryBrowserDialog({
   };
 
   const handleFileSelect = () => {
-    if (selectedFile) {
+    if(isPush){
+      onFileSelect?.(currentPath??"")
+    }
+    else if (selectedFile) {
       onFileSelect?.(selectedFile.path);
       onOpenChange(false);
     }
@@ -326,7 +332,7 @@ export function RepositoryBrowserDialog({
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleFileSelect} disabled={!selectedFile}>
+              <Button onClick={handleFileSelect} disabled={!selectedFile && !isPush}>
                 Select File
               </Button>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 import Header from "@/components/common/header/header";
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Accordion,
@@ -20,7 +20,7 @@ import { Search } from "lucide-react";
 import ConfirmationDialog from "@/components/common/dialog/confirmation";
 import { GitHubProjectType } from "@/mongodb/model/github";
 import { ProjectCreateEdit } from "./create/tabs_form";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { RepositoryBrowserDialog } from "./files_viewer/file_viewer";
 import { RepositoryProvider } from "@/types/repository";
@@ -42,7 +42,6 @@ export default function ProjectSection({
       <div className="flex-1 min-h-0">
         <SearchableDropdown
           options={projects}
-          onSelect={() => console.log("select")}
         />
       </div>
       <ProjectCreateEdit open={open} setOpen={setOpen} />
@@ -140,7 +139,6 @@ const ProjectContextMenu: React.FC<ContextMenuProps> = ({
 
 interface SearchableDropdownProps {
   options: GitHubProjectType[];
-  onSelect: (value: string) => void;
 }
 
 const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
@@ -197,8 +195,15 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
     }
   };
   const renderOptions = (opts: GitHubProjectType[], childIndex: number = 1) =>
-    opts?.map((opt) => (
-      <AccordionItem key={opt.id} value={opt.name}>
+    opts?.map((opt) =>{
+      
+      return (
+      <AccordionItem  onClick={()=>{
+        if(!((opt?.children || []).length > 0)){
+          router.push("/develop/"+(opt._id?.toString() ?? ""))
+        }
+        setSearchTerm("")
+      }} key={opt.id} value={opt._id?.toString()??""}>
         <ProjectContextMenu
           isParentLevel={childIndex === 1}
           isShared={opt.isShared}
@@ -215,12 +220,13 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           
         >
           <AccordionTrigger
-            hasChildren={opt && opt.children && opt.children.length > 0}
+            hasChildren={(opt?.children || []).length > 0}
             className={
               "flex items-center justify-between" +
               " " +
               (childIndex > 1 ? "text-muted-foreground" : "")
             }
+            
           >
             <span
               style={{
@@ -240,9 +246,9 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
               />
               {opt.name}
               {opt.isShared ? (
-                <span className="ml-2 text-sm text-gray-500">(Shared)</span>
+                <span className="ml-2 mt-1 text-xs text-gray-500">(Shared)</span>
               ) : (
-                <span className="ml-2 text-sm text-primary">(Main)</span>
+                <span className="ml-2 mt-1 text-xs text-primary">(Main)</span>
               )}
             </span>
           </AccordionTrigger>
@@ -255,8 +261,8 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           </AccordionContent>
         )}
       </AccordionItem>
-    ));
-
+    )});
+    const {projectId} = useParams()
   return (
     <div className="h-full flex flex-col">
       <div className="p-2 flex-shrink-0">
@@ -269,7 +275,8 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
       </div>
       <div className="flex-1 min-h-0 overflow-hidden">
         <Accordion
-          type="multiple"
+          type="single"
+          defaultValue={projectId?.toString()}
           className="h-full overflow-y-auto overflow-x-hidden"
         >
           {renderOptions(filteredOptions)}
@@ -281,6 +288,8 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           repository={{
             provider: RepositoryProvider.GITHUB,
             fullName: (viewFiles?.owner??"")+"/"+(viewFiles?.name ??""),
+            owner:viewFiles?.owner??"",
+            name:viewFiles?.name??"",
             accessToken: viewFiles?.token,
           }}
         />

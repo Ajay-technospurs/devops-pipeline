@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { useReactFlow } from "@xyflow/react";
 import {
@@ -10,8 +11,11 @@ import {
 } from "lucide-react";
 import { usePanelRefs } from "@/provider/layout_provider";
 import { useFlow } from "@/provider/canvas_provider";
+import { GitHubFilePush } from "../upload/git/git_push";
+import { RepositoryProvider } from "@/types/repository";
+import { GitHubProjectType } from "@/mongodb/model/github";
 
-const CustomControls = () => {
+const CustomControls = ({project}:{project:GitHubProjectType}) => {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const { getPanelRef, expandPanel, collapsePanel, togglePanel } =
     usePanelRefs();
@@ -50,14 +54,21 @@ const CustomControls = () => {
           </button>
         ) : null}
       </div>
-      <button
+      <GitHubFilePush repository={{
+        provider: RepositoryProvider.GITHUB,
+        owner: project.owner,
+        fullName: (project?.owner??"")+"/"+(project?.name ??""),
+        name: project.name,
+        accessToken: project.token??undefined,
+      }} data={state.nodes} />
+      {/* <buttons
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => {
           handleDownload();
         }}
       >
         <Download className="w-5 h-5 foreground-dark" />
-      </button>
+      </button> */}
       <button
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => {

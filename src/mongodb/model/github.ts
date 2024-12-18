@@ -23,6 +23,7 @@ const RepositorySchema = new Schema<GitHubProjectType>({
   isShared: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  children:{type:Object,default:[]}
 });
 
 // Use `mongoose.models` to avoid OverwriteModelError

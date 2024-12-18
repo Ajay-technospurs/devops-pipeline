@@ -30,13 +30,15 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between py-2 text-sm font-medium text-left transition-all hover:font-semibold ",
-        "data-[state=open]:bg-secondary data-[state=open]:border-l-4 data-[state=open]:border-primary data-[state=open]:text-primary",
+        "relative flex flex-1 items-center justify-between py-2 text-sm font-medium text-left transition-all hover:bg-secondary/80",
+        "before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-primary before:opacity-0 before:transition-opacity before:duration-200",
+        "data-[state=open]:before:opacity-100 data-[state=open]:bg-secondary",
         hasChildren
           ? "cursor-pointer [&[data-state=open]>svg]:rotate-180"
-          : "cursor-default ", // Adjust UI for items without children
+          : "cursor-pointer",
         className
       )}
+      
       {...(hasChildren ? props : {})} // Disable interaction for items without children
     >
       {children}

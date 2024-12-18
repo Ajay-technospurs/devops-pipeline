@@ -1,3 +1,4 @@
+"use client"
 import React, { createContext, useContext, useRef } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels"; // Replace with actual library import
 

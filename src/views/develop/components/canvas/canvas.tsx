@@ -24,6 +24,7 @@ import {
 import NodeSearch from "./search/nodes_search";
 import NodeContextMenu from "./right_click/right_click_node";
 import { usePanelRefs } from "@/provider/layout_provider";
+import { GitHubProjectType } from "@/mongodb/model/github";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -44,7 +45,7 @@ const edgeTypes = {
   // selfconnecting: SelfConnectingEdge,
   buttonedge: ButtonEdge,
 };
-const DevelopCanvas: React.FC = () => {
+const DevelopCanvas: React.FC <{project:GitHubProjectType}>= ({project}) => {
   const {
     state,
     dispatch,
@@ -123,7 +124,6 @@ const DevelopCanvas: React.FC = () => {
   const onInit = useCallback(
     (instance: ReactFlowInstance<any, any>) => {
       setReactFlowInstance(instance);
-      instance.setViewport({ x: 0, y: 0, zoom: 0.9 }); // Set initial zoom level and position
     },
     [viewport]
   );
@@ -174,6 +174,7 @@ const DevelopCanvas: React.FC = () => {
             >
               <ReactFlow
               ref={ref}
+              defaultViewport={{zoom:0.9,x:0,y:0}}
                 nodes={state.nodes}
                 edges={state.edges}
                 onPaneClick={onPaneClick}
@@ -213,7 +214,7 @@ const DevelopCanvas: React.FC = () => {
                   showZoom={false}
                   className="flex !flex-row-reverse gap-2 p-1 m-1 rounded-md left-0"
                 >
-                  <CustomControls />
+                  <CustomControls project={project} />
                 </Controls>
                 {menu && <NodeContextMenu setMenu={setMenu} node={menu.node} onDuplicate={duplicateNode} onDelete={deleteNode} menu={menu} />}
               </ReactFlow>

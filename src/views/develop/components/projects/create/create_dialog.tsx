@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 import { ProjectType } from "@/types";
 
 // Define the schema using zod
