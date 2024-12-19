@@ -4,6 +4,8 @@ import { RepositoryProvider } from "@/types/repository";
 import { RepositoryBrowserDialog } from "../../../projects/files_viewer/file_viewer";
 import { Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast"; // Assuming Shadcn's toast setup is used
+import { GitHubProjectType } from "@/mongodb/model/github";
+import { AddSubProjectbyId } from "@/actions/projects";
 
 interface GitHubFilePushProps {
   repository: {
@@ -12,6 +14,8 @@ interface GitHubFilePushProps {
     fullName: string;
     name: string;
     accessToken?: string;
+    id: string;
+    isPrivate: boolean;
   };
   data: Record<string, any>; // Ensuring the data is an object
   fileName?: string; // Optional custom filename
@@ -41,7 +45,9 @@ export function GitHubFilePush({
       });
 
       // Convert content to Base64
-      const contentBase64 = Buffer.from(JSON.stringify(data, null, 2)).toString("base64");
+      const contentBase64 = Buffer.from(JSON.stringify(data, null, 2)).toString(
+        "base64"
+      );
 
       let sha: string | undefined;
       try {
@@ -71,15 +77,25 @@ export function GitHubFilePush({
         title: `File successfully pushed to GitHub!`,
         description: fullPath,
       });
-      
+      const gitData: any = response.data;
+      const body: Partial<GitHubProjectType> = {
+        owner: repository.owner,
+        name: gitData?.content?.name,
+        url: gitData?.content?.url,
+        token: repository.accessToken,
+        isPrivate: repository.accessToken != null,
+      };
+      await AddSubProjectbyId(repository?.id, body);
       return {
         success: true,
-        data: response.data,
+        data: gitData,
       };
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || error.message || "An unknown error occurred";
-      toast({title:`Failed to push file: ${errorMessage}`,});
+        error.response?.data?.message ||
+        error.message ||
+        "An unknown error occurred";
+      toast({ title: `Failed to push file: ${errorMessage}` });
       return {
         success: false,
         error: errorMessage,
@@ -89,14 +105,14 @@ export function GitHubFilePush({
 
   const handleFileSelect = async (filePath: string) => {
     if (!repository.accessToken) {
-      toast({title:"Access token is required to push files.",});
+      toast({ title: "Access token is required to push files." });
       // toast.error("Access token is required to push files.");
       return;
     }
 
-     await pushFileToGitHub(filePath);
+    await pushFileToGitHub(filePath);
 
-    setIsRepositoryBrowserOpen(false);
+    // setIsRepositoryBrowserOpen(false);
   };
 
   return (
@@ -105,13 +121,13 @@ export function GitHubFilePush({
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => setIsRepositoryBrowserOpen(true)}
       >
-        <Download className="w-5 h-5" />
+        <Download className="w-5 h-5 foreground-dark" />
       </button>
 
       {isRepositoryBrowserOpen && (
         <RepositoryBrowserDialog
           isOpen={isRepositoryBrowserOpen}
-          onOpenChange={setIsRepositoryBrowserOpen}
+          onOpenChange={(open) => setIsRepositoryBrowserOpen(open)}
           repository={repository}
           onFileSelect={handleFileSelect}
           initialPath=""
