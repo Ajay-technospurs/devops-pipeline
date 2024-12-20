@@ -53,7 +53,10 @@ export function GitHubRepositoryForm({
   }, [initialData, form]);
 
   const extractFullNameFromUrl = (url: string) => {
-    const match = url.match(/github\.com\/([^/]+\/[^/]+)(\.git)?$/);
+    if(url.endsWith(".git")){
+      url = url.replace(".git","")
+    }
+    const match = url.match(/github\.com\/([^/]+\/[^/]+)(?:\.git)?$/);
     return match ? match[1] : '';
   };
 
@@ -124,6 +127,7 @@ export function GitHubRepositoryForm({
                     const url = e.target.value;
                     field.onChange(url);
                     const fullName = extractFullNameFromUrl(url);
+                    console.log("Extracted Full Name:", fullName);  // Debugging line
                     form.setValue('fullName', fullName);
                     form.setValue('name', fullName.split('/')[1] || '');
                   }}

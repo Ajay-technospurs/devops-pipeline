@@ -16,7 +16,7 @@ const NodeSearch = ({}) => {
   } = useFlow();
   const { collapsePanel } = usePanelRefs();
   const filteredNodes = useMemo(() => {
-    return nodes.filter((node) =>
+    return nodes?.filter((node) =>
       (node?.data?.label as string)
         .toLowerCase()
         .includes(searchTerm.toLowerCase())

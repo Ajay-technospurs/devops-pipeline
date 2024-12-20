@@ -80,7 +80,9 @@ export function ProjectCreateEdit({
               const FormComponent = config.FormComponent;
               return (
                 <TabsContent key={provider} value={provider}>
-                  <FormComponent />
+                  <FormComponent onSuccess={()=>{
+                    window.location.reload()
+                  }} />
                 </TabsContent>
               );
             })}

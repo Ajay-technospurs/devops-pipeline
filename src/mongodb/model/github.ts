@@ -1,21 +1,23 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 // Define the interface for TypeScript
 export interface GitHubProjectType extends Document {
   owner: string;
   name: string;
+  repo: string;
   url: string;
   token?: string;
   isPrivate: boolean;
   createdAt: Date;
   updatedAt: Date;
-  isShared?:boolean;
-  children?:GitHubProjectType[]
+  isShared?: boolean;
+  children?: GitHubProjectType[];
 }
 
 // Define the schema
 const RepositorySchema = new Schema<GitHubProjectType>({
   owner: { type: String, required: true, trim: true },
+  repo: { type: String, required: true, trim: true },
   name: { type: String, required: true, trim: true },
   url: { type: String, required: true, unique: true },
   token: { type: String },
@@ -23,9 +25,10 @@ const RepositorySchema = new Schema<GitHubProjectType>({
   isShared: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  children:{type:Object,default:[]}
+  children: { type: Object, default: [] },
 });
 
 // Use `mongoose.models` to avoid OverwriteModelError
 export const Projects =
-  mongoose.models.Projects || mongoose.model<GitHubProjectType>('Projects', RepositorySchema,"projects");
+  mongoose.models.Projects ||
+  mongoose.model<GitHubProjectType>("Projects", RepositorySchema, "projects");

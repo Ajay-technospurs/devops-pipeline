@@ -57,12 +57,13 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
       <GitHubFilePush repository={{
         provider: RepositoryProvider.GITHUB,
         owner: project.owner,
+        repo:project.repo,
         id:project._id?.toString()??"",
         fullName: (project?.owner??"")+"/"+(project?.name ??""),
         name: project.name,
         isPrivate:project.isPrivate,
         accessToken: project.token??undefined,
-      }} data={state.nodes} />
+      }} data={{nodes:state.nodes,edges:state.edges}} />
       {/* <buttons
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => {

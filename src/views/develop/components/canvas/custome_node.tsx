@@ -54,7 +54,7 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
         }`}
       >
         {nodeData.icon ? (
-          <div className="text-lg text-primary-foreground">{nodeData.icon}</div>
+          <div className="text-lg text-primary-foreground">{renderIcon(nodeData.icon)}</div>
         ) : (
           <Image
             style={{ marginRight: "4px" }}
@@ -75,7 +75,21 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
       </div>
     );
   };
-
+  const renderIcon = (icon:any) => {
+    if (typeof icon === "string") {
+        return icon; // Render string or emoji
+    } else if (React.isValidElement(icon)) {
+        return icon; // Render valid React element
+    } else {
+        return <Image
+        style={{ marginRight: "4px" }}
+        src={`/assets/palette_child_light.svg`}
+        width={40}
+        height={40}
+        alt={nodeData.label}
+      />; // Fallback for unsupported types
+    }
+};
   const renderHandles = () => {
     const handleStyle: React.CSSProperties = {
       background: "hsl(var(--primary-foreground))",

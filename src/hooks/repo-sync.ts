@@ -25,8 +25,9 @@ export function useRepositorySync() {
         lastSynced: new Date(),
         token:repositoryData.accessToken
       });
-
+      
       return response.data;
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       throw err;

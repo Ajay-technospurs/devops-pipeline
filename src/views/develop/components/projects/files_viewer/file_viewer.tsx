@@ -36,6 +36,7 @@ interface RepositoryBrowserDialogProps {
     fullName: string;
     owner: string;
     name: string;
+    repo: string;
     accessToken?: string;
   };
   initialPath?: string;
@@ -65,11 +66,11 @@ export function RepositoryBrowserDialog({
   const octokit = new Octokit({
     auth: repository.accessToken,
     request: {
-      fetch: (url:any, options:any) => {
-        options.cache = 'no-store';
+      fetch: (url: any, options: any) => {
+        options.cache = "no-store";
         return fetch(url, options);
-      }
-    }
+      },
+    },
   });
 
   const handleDeleteClick = (item: RepositoryItem) => {
@@ -139,15 +140,39 @@ export function RepositoryBrowserDialog({
       setItemToDelete(null);
     }
   };
-  const fetchContents = async (path: string = "", forceRefresh = false) => {
+  const fetchContents = async (fullPath: string = "", forceRefresh = false) => {
     setIsLoading(true);
     setError(null);
+    const isFilePath = fullPath.includes("api.github.com");
     try {
+      let owner = repository.owner;
+      let repo = repository.repo!=""&&repository.repo!=undefined&&repository.repo!=null?repository?.repo:repository.name;
+      let path = fullPath;
+
+      if (isFilePath) {
+        // Extract owner, repo, and relative path from the full URL
+        const match = fullPath.match(
+          /repos\/([^/]+)\/([^/]+)\/contents\/(.+?)(\?|$)/
+        );
+        if (match) {
+          owner = match[1]; // Extract owner
+          repo = match[2]; // Extract repo name
+          path = match[3]; // Extract the relative path
+
+          // Remove the filename from the path
+          const lastSlashIndex = path.lastIndexOf("/");
+          if (lastSlashIndex !== -1) {
+            path = path.substring(0, lastSlashIndex); // Keep only the directory
+          }
+        }
+      }
+
+      // Prepare the options
       const options = {
-        owner: repository.owner,
-        repo: repository.name,
+        owner,
+        repo,
         path,
-        request: {cache:"no-store"},
+        request: { cache: "no-store" },
       };
 
       const { data } = await octokit.repos.getContent(options);
@@ -159,6 +184,14 @@ export function RepositoryBrowserDialog({
             type: item.type === "dir" ? "dir" : "file",
           }))
         : [];
+      if (isFilePath) {
+        const fileName = fullPath.substring(
+          fullPath.lastIndexOf("/") + 1,
+          fullPath.indexOf("?") > -1 ? fullPath.indexOf("?") : undefined
+        );
+        const item = parsedItems.find((ele) => ele.name == fileName);
+        fetchFileContent(item as RepositoryItem);
+      }
       setItems(parsedItems as any);
       setBreadcrumbs(path.split("/").filter(Boolean));
       setCurrentPath(path);
@@ -203,7 +236,7 @@ export function RepositoryBrowserDialog({
     try {
       const { data } = await octokit.repos.getContent({
         owner: repository.owner,
-        repo: repository.name,
+        repo: repository.repo!=""&&repository.repo!=undefined&&repository.repo!=null?repository?.repo:repository.name,
         path: file.path,
       });
 
@@ -230,7 +263,7 @@ export function RepositoryBrowserDialog({
     } else {
       setSelectedFile(null);
       const newPath = breadcrumbs.slice(0, index + 1).join("/");
-      fetchContents(newPath,true);
+      fetchContents(newPath, true);
     }
   };
 
@@ -249,9 +282,12 @@ export function RepositoryBrowserDialog({
   };
 
   useEffect(() => {
-    if (isOpen) {
-      fetchContents(initialPath);
+    async function fetchData() {
+      if (isOpen) {
+        await fetchContents(initialPath);
+      }
     }
+    fetchData();
   }, [isOpen, initialPath]);
 
   return (

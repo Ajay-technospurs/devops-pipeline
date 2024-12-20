@@ -8,13 +8,13 @@ import DevelopCanvas from "../components/canvas/canvas";
 import ConfigComponent from "../components/configuration/config";
 import { GitHubProjectType } from "@/mongodb/model/github";
 
-export default function PipeLineSection({project}:{project:GitHubProjectType}){
+export default function PipeLineSection({project,file}:{project:GitHubProjectType,file?:GitHubProjectType}){
     const { getPanelRef } = usePanelRefs();
     return (
         
         <ResizablePanelGroup className="h-full" direction="vertical">
           <ResizablePanel defaultSize={60} ref={getPanelRef("develop-canvas")}>
-            <DevelopCanvas project={project} />
+            <DevelopCanvas project={project} file={file} />
           </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel

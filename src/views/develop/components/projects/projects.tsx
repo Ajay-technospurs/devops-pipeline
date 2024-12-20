@@ -1,6 +1,6 @@
 "use client";
 import Header from "@/components/common/header/header";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Accordion,
@@ -16,14 +16,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import ProjectFormDialog from "./create/create_dialog";
-import { Search } from "lucide-react";
+import { File, Search } from "lucide-react";
 import ConfirmationDialog from "@/components/common/dialog/confirmation";
 import { GitHubProjectType } from "@/mongodb/model/github";
 import { ProjectCreateEdit } from "./create/tabs_form";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { RepositoryBrowserDialog } from "./files_viewer/file_viewer";
 import { RepositoryProvider } from "@/types/repository";
+import Link from "next/link";
 
 export default function ProjectSection({
   projects,
@@ -40,9 +41,7 @@ export default function ProjectSection({
         onActionClick={() => setOpen(true)}
       />
       <div className="flex-1 min-h-0">
-        <SearchableDropdown
-          options={projects}
-        />
+        <SearchableDropdown options={projects} />
       </div>
       <ProjectCreateEdit open={open} setOpen={setOpen} />
     </div>
@@ -177,6 +176,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
       const response = await axios.delete(`/api/projects?id=${id}`);
 
       if (response) {
+        router.push("/develop");
       } else {
         console.error("Failed to delete project");
       }
@@ -184,7 +184,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
       console.error("Error deleting project:", error);
     } finally {
       setTimeout(() => {
-        router.refresh();
+        window.location.reload()
       }, 1000);
     }
   };
@@ -194,18 +194,30 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
       setEdit(option);
     }
   };
-  const renderOptions = (opts: GitHubProjectType[], childIndex: number = 1) =>
-    opts?.map((opt) =>{
-      
-      return (
-      <AccordionItem  onClick={()=>{
-        if(!((opt?.children || []).length > 0)){
-          router.push("/develop/"+(opt._id?.toString() ?? ""))
-        }
-        setSearchTerm("")
-      }} key={opt.id} value={opt._id?.toString()??""}>
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+ 
+  // Get a new searchParams string by merging the current
+  // searchParams with a provided key/value pair
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+ 
+      return params.toString()
+    },
+    [searchParams]
+  )
+  const renderOptions = (opts: GitHubProjectType[]) =>
+    opts?.map((opt) => (
+      <AccordionItem key={opt.id} value={opt._id?.toString() ?? ""}
+      onClick={(e)=>{
+        e.stopPropagation()
+        router.push("/develop/" + (opt._id?.toString() ?? ""));
+      }}
+      >
         <ProjectContextMenu
-          isParentLevel={childIndex === 1}
+          isParentLevel={true}
           isShared={opt.isShared}
           isMain={!opt.isShared}
           onEdit={() => handleEdit(opt)}
@@ -214,33 +226,17 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           onDelete={() => handleDelete(opt._id?.toString() ?? "")}
           OnViewFiles={() => {
             setViewFiles(opt);
-            console.log(opt,"what");
-            
           }}
-          
         >
           <AccordionTrigger
             hasChildren={(opt?.children || []).length > 0}
-            className={
-              "flex items-center justify-between" +
-              " " +
-              (childIndex > 1 ? "text-muted-foreground" : "")
-            }
-            
+            className="flex items-center justify-between"
           >
-            <span
-              style={{
-                paddingLeft: `calc(12px * ${childIndex})`,
-                display: "flex",
-              }}
-              className="whitespace-nowrap overflow-clip"
-            >
+            <span className="flex whitespace-nowrap overflow-clip pl-2">
               <Image
-                style={{ marginRight: "4px" }}
-                src={`/assets/${
-                  opt.isShared == true ? "folder_shared" : "folder_main_shared"
-                }.svg`}
-                alt={"folder icon"}
+                className="mr-1"
+                src={`/assets/${opt.isShared ? "folder_shared" : "folder_main_shared"}.svg`}
+                alt="folder icon"
                 width={20}
                 height={20}
               />
@@ -253,16 +249,31 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
             </span>
           </AccordionTrigger>
         </ProjectContextMenu>
+  
+        {/* Render children as a simple list of links */}
         {opt.children && opt.children.length > 0 && (
           <AccordionContent>
-            <div className="">
-              {opt&&renderOptions(opt.children, childIndex + 1)}
+            <div className="pl-6 hover:bg-border">
+              {opt.children.map((child) => (
+                <Link
+
+                  key={child.id}
+                  href={`${pathname}?${createQueryString('child', child.name?.toString() ?? '')}`}
+                  className="flex items-center py-2 px-2 text-sm text-muted-foreground"
+                  onClick={(e) =>{
+                    e.stopPropagation()
+                    setSearchTerm("")}}
+                >
+                  <File className="mr-2 h-4 w-4" />
+                  {child.name}
+                </Link>
+              ))}
             </div>
           </AccordionContent>
         )}
       </AccordionItem>
-    )});
-    const {projectId} = useParams()
+    ));
+  const { projectId } = useParams();
   return (
     <div className="h-full flex flex-col">
       <div className="p-2 flex-shrink-0">
@@ -282,17 +293,19 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options }) => {
           {renderOptions(filteredOptions)}
         </Accordion>
       </div>
-        <RepositoryBrowserDialog
-          isOpen={viewFiles!=null}
-          onOpenChange={()=>setViewFiles(null)}
-          repository={{
-            provider: RepositoryProvider.GITHUB,
-            fullName: (viewFiles?.owner??"")+"/"+(viewFiles?.name ??""),
-            owner:viewFiles?.owner??"",
-            name:viewFiles?.name??"",
-            accessToken: viewFiles?.token,
-          }}
-        />
+      <RepositoryBrowserDialog
+        isOpen={viewFiles != null}
+        onOpenChange={() => setViewFiles(null)}
+        repository={{
+          provider: RepositoryProvider.GITHUB,
+          fullName: (viewFiles?.owner ?? "") + "/" + (viewFiles?.repo ?? ""),
+          owner: viewFiles?.owner ?? "",
+          name: viewFiles?.name ?? "",
+          repo: viewFiles?.repo ?? "",
+          accessToken: viewFiles?.token,
+        }}
+        initialPath={viewFiles?.url.includes("api") ? viewFiles.url : undefined}
+      />
       {/* <ProjectFormDialog
         open={edit != null}
         setOpen={(open) => {

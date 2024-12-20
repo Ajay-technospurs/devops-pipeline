@@ -25,6 +25,7 @@ import NodeSearch from "./search/nodes_search";
 import NodeContextMenu from "./right_click/right_click_node";
 import { usePanelRefs } from "@/provider/layout_provider";
 import { GitHubProjectType } from "@/mongodb/model/github";
+import { Octokit } from "@octokit/rest";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -45,11 +46,12 @@ const edgeTypes = {
   // selfconnecting: SelfConnectingEdge,
   buttonedge: ButtonEdge,
 };
-const DevelopCanvas: React.FC <{project:GitHubProjectType}>= ({project}) => {
+const DevelopCanvas: React.FC <{project:GitHubProjectType,file?:GitHubProjectType}>= ({project,file}) => {
   const {
     state,
     dispatch,
     setNodes,
+    setEdges,
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -119,7 +121,42 @@ const DevelopCanvas: React.FC <{project:GitHubProjectType}>= ({project}) => {
     },
     [state.nodes, reactFlowInstance, setNodes, dispatch]
   );
-
+  const octokit = new Octokit({
+    auth: file?.token || undefined,
+  });
+  useEffect(()=>{
+    if(file && file.name){
+      
+      fetchFileContent(file)
+      // 
+    }
+  },[file])
+  const fetchFileContent = async (file: GitHubProjectType) => {
+      try {
+        let path;
+        const match = file.url.match(
+          /repos\/([^/]+)\/([^/]+)\/contents\/(.+?)(\?|$)/
+        );
+        if (match) {
+          path = match[3]; // Extract the relative path
+        }
+        const { data } = await octokit.repos.getContent({
+          owner: file.owner,
+          repo: file.repo??file.name,
+          path: path??""
+        });
+  
+        const content = "content" in data ? atob(data.content) : "";
+        const json = JSON.parse(content);
+        setNodes(json.nodes);
+        dispatch({ type: "SET_NODES", payload: json.nodes });
+        setEdges(json.edges)
+        dispatch({ type: "SET_EDGES", payload: json.edges })
+        // setSelectedFile({ ...file, content });
+      } catch (err: any) {
+        // setError(err.message || "Failed to fetch file content");
+      }
+    };
   // ReactFlow initialization
   const onInit = useCallback(
     (instance: ReactFlowInstance<any, any>) => {
@@ -174,6 +211,7 @@ const DevelopCanvas: React.FC <{project:GitHubProjectType}>= ({project}) => {
             >
               <ReactFlow
               ref={ref}
+              
               defaultViewport={{zoom:0.9,x:0,y:0}}
                 nodes={state.nodes}
                 edges={state.edges}

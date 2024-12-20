@@ -77,15 +77,19 @@ export async function POST(request: Request) {
     if (existingRepo) {
       return  Response.json({ error: 'Projects already exists' });
     }
-    const newRepository =await Projects.create({
+    const options = {
       owner:owner.login,
-      name,
+      name:name,
+      repo:name,
       url:html_url,
       token: visibility=="private" ? token : undefined,
       isPrivate:visibility=="private",
-    })
+    }
+    const newRepository =await Projects.create(options)
     // await newRepository.save();
-    return Response.json(newRepository);
+    console.log(JSON.stringify(newRepository.toObject(), null, 2),"newRepository",options);
+    
+    return Response.json({created:JSON.stringify(newRepository.toObject(), null, 2),body:options});
   } catch (error) {
     return Response.json({ error: 'Failed to add repository',err:JSON.stringify(error)});
   }

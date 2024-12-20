@@ -11,6 +11,7 @@ interface GitHubFilePushProps {
   repository: {
     provider: RepositoryProvider;
     owner: string;
+    repo:string
     fullName: string;
     name: string;
     accessToken?: string;
@@ -81,6 +82,7 @@ export function GitHubFilePush({
       const body: Partial<GitHubProjectType> = {
         owner: repository.owner,
         name: gitData?.content?.name,
+        repo: repository.name,
         url: gitData?.content?.url,
         token: repository.accessToken,
         isPrivate: repository.accessToken != null,
