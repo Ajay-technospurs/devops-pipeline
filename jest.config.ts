@@ -18,9 +18,7 @@ const config: Config = {
   ],
   extensionsToTreatAsEsm: ['.ts', '.tsx', '.jsx'],
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  transform: {
-    '^.+\\.(t|j)sx?$': '@swc/jest'
-  }
+
 }
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
 export default createJestConfig(config)

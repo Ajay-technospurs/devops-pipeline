@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { createContext, useContext, useRef } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels"; // Replace with actual library import
 
@@ -6,7 +6,7 @@ import { ImperativePanelHandle } from "react-resizable-panels"; // Replace with 
 type PanelRefContextType = {
   getPanelRef: (id: string) => React.RefObject<ImperativePanelHandle>;
   collapsePanel: (id: string) => void;
-  expandPanel: (id: string,minSize?:number) => void;
+  expandPanel: (id: string, minSize?: number) => void;
   togglePanel: (id: string) => void;
 };
 
@@ -37,13 +37,12 @@ export const PanelRefProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const expandPanel = (id: string,minSize?:number): void => {
+  const expandPanel = (id: string, minSize?: number): void => {
     const panel = getPanelRef(id).current;
     if (panel) {
-      if(minSize){
-        panel.expand(minSize)
-      }
-      else{
+      if (minSize) {
+        panel.expand(minSize);
+      } else {
         panel.expand();
       }
     }
@@ -51,7 +50,11 @@ export const PanelRefProvider: React.FC<{ children: React.ReactNode }> = ({
   const togglePanel = (id: string): void => {
     const panel = getPanelRef(id).current;
     if (panel) {
-      panel.isCollapsed() ? panel.expand() : panel.collapse();
+      if (panel.isCollapsed()) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
     }
   };
   return (

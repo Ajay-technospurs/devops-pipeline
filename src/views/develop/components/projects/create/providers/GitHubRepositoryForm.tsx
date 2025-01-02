@@ -25,7 +25,7 @@ export function GitHubRepositoryForm({
   onSuccess,
 }: {
   initialData?: any | null;
-  onSuccess?: Function;
+  onSuccess?: any;
 }) {
   const { syncRepository, updateRepository } = useRepositorySync();
   const [isPrivate, setIsPrivate] = useState(initialData?.isPrivate || false);

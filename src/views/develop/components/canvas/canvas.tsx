@@ -91,7 +91,7 @@ const DevelopCanvas: React.FC <{project:GitHubProjectType,file?:GitHubProjectTyp
         y: event.clientY,
       });
 
-      let newNode: any = {
+      const  newNode: any = {
         id: `${item.id}-${new Date().getTime()}`,
         type: "custom",
         position,
@@ -124,13 +124,7 @@ const DevelopCanvas: React.FC <{project:GitHubProjectType,file?:GitHubProjectTyp
   const octokit = new Octokit({
     auth: file?.token || undefined,
   });
-  useEffect(()=>{
-    if(file && file.name){
-      
-      fetchFileContent(file)
-      // 
-    }
-  },[file])
+  
   const fetchFileContent = async (file: GitHubProjectType) => {
       try {
         let path;
@@ -157,12 +151,19 @@ const DevelopCanvas: React.FC <{project:GitHubProjectType,file?:GitHubProjectTyp
         // setError(err.message || "Failed to fetch file content");
       }
     };
+    useEffect(()=>{
+      if(file && file.name){
+        
+        fetchFileContent(file)
+        // 
+      }
+    },[file,fetchFileContent])
   // ReactFlow initialization
   const onInit = useCallback(
     (instance: ReactFlowInstance<any, any>) => {
       setReactFlowInstance(instance);
     },
-    [viewport]
+    []
   );
   const onViewportChange = useCallback((newViewport: any) => {
     setViewport(newViewport);

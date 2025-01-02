@@ -107,8 +107,8 @@ export const AttributesTabsLayout: React.FC = () => {
     if (previousNodes.length == 0) {
       return;
     } else {
-      let input: Array<GlobalInput> = [];
-      let output: Array<string> = [];
+      const input: Array<GlobalInput> = [];
+      const output: Array<string> = [];
       previousNodes.map((ele) => {
         const schema: any = ele.data?.schemaData;
         if (schema && schema?.inputs) {
@@ -126,7 +126,7 @@ export const AttributesTabsLayout: React.FC = () => {
       setInputs(input);
       setOutputs(output)
     }
-  }, [state]);
+  }, [state,getPreviousNodes]);
 
   const handleDelete = (id: string) => {
     setGlobalInputs((prev) => prev.filter((input) => input.id !== id));

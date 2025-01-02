@@ -5,7 +5,7 @@ export default async function Page() {
                 Select a Project
             </h2>
             <p className="text-muted-foreground max-w-md">
-                Use the project sidebar to select or create a project. Once selected, you'll see its details and options here.
+                Use the project sidebar to select or create a project. Once selected, you&apos;ll see its details and options here.
             </p>
             {/* <img 
                 src="/empty-state.svg" 
