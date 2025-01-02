@@ -9,8 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useRouter } from 'next/navigation';
-import { Toaster } from '@/components/ui/toaster';
-import { toast } from '@/hooks/use-toast';
+import { Toaster } from '../../components/ui/toaster';
+import { toast } from '../../hooks/use-toast';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -139,8 +139,9 @@ const LoginForm = () => {
 
             <Button 
               type="submit" 
-              className="w-full bg-cyan-500 hover:bg-cyan-600"
+              className="w-full bg-primary hover:bg-primary"
               disabled={isSubmitting}
+              data-testid="login-action-button"
             >
               {isSubmitting ? 'Signing in...' : 'Login'}
             </Button>

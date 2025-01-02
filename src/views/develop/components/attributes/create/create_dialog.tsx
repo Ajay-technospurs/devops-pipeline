@@ -29,6 +29,7 @@ export default function CreateAttributesDialog({
     e.preventDefault();
     // Handle your form submission logic here
     console.log(formData);
+    if(formData.name)
     setOpen(false);
     setFormData({ name: "", filePath: "" });
   };
@@ -87,7 +88,7 @@ export default function CreateAttributesDialog({
             >
               Cancel
             </Button>
-            <Button size={"lg"} type="submit" className="flex-1">Add</Button>
+            <Button size={"lg"} data-testid="create-attribute-button" type="submit" className="flex-1">Add</Button>
           </div>
         </form>
       </DialogContent>

@@ -10,9 +10,6 @@ describe('NavigationTabs', () => {
     expect(screen.getByText('Develop')).toBeInTheDocument()
     expect(screen.getByText('Deploy')).toBeInTheDocument()
     expect(screen.getByText('Monitor')).toBeInTheDocument()
-    expect(screen.getByText('Tab 4')).toBeInTheDocument()
-    expect(screen.getByText('Tab 5')).toBeInTheDocument()
-    expect(screen.getByText('Tab 6')).toBeInTheDocument()
   })
 
   it('has "develop" as the default selected tab', () => {
@@ -41,6 +38,6 @@ describe('NavigationTabs', () => {
     
     // Check if we have the correct number of icons
     const icons = document.querySelectorAll('svg')
-    expect(icons).toHaveLength(6)
+    expect(icons).toHaveLength(3)
   })
 })

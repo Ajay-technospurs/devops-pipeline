@@ -6,7 +6,6 @@ import {
   FullscreenIcon,
   Maximize,
   X,
-  Download,
   SearchIcon,
 } from "lucide-react";
 import { usePanelRefs } from "@/provider/layout_provider";
@@ -20,22 +19,11 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
   const { getPanelRef, expandPanel, collapsePanel, togglePanel } =
     usePanelRefs();
   const { state, dispatch } = useFlow();
-  const handleDownload = () => {
-    const jsonData = JSON.stringify(state.nodes, null, 2);
-    const blob = new Blob([jsonData], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
   return (
     <div className="flex gap-x-2 w-full">
       <button
+        data-testid="toggle-sidebar"
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => {
           togglePanel("sidebar");
@@ -47,6 +35,7 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
         <div className="">{state?.selectedNode?.data?.label as string}</div>
         {state?.selectedNode?.data?.label ? (
           <button
+            data-testid="deselect-node"
             className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
             onClick={() => dispatch({ type: "SELECT_NODE", payload: null })}
           >
@@ -54,40 +43,37 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
           </button>
         ) : null}
       </div>
-      <GitHubFilePush repository={{
-        provider: RepositoryProvider.GITHUB,
-        owner: project.owner,
-        repo:project.repo,
-        id:project._id?.toString()??"",
-        fullName: (project?.owner??"")+"/"+(project?.name ??""),
-        name: project.name,
-        isPrivate:project.isPrivate,
-        accessToken: project.token??undefined,
-      }} data={{nodes:state.nodes,edges:state.edges}} />
-      {/* <buttons
-        className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
-        onClick={() => {
-          handleDownload();
+      <GitHubFilePush
+        repository={{
+          provider: RepositoryProvider.GITHUB,
+          owner: project.owner,
+          repo: project.repo,
+          id: project._id?.toString() ?? "",
+          fullName: (project?.owner ?? "") + "/" + (project?.name ?? ""),
+          name: project.name,
+          isPrivate: project.isPrivate,
+          accessToken: project.token ?? undefined,
         }}
-      >
-        <Download className="w-5 h-5 foreground-dark" />
-      </button> */}
+        data={{ nodes: state.nodes, edges: state.edges }}
+      />
       <button
+        data-testid="search"
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => {
-          expandPanel("node-search",30)
+          expandPanel("node-search", 30);
         }}
       >
         <SearchIcon className="w-5 h-5 foreground-dark" />
       </button>
       <button
+        data-testid="fit-view"
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
-        onClick={() => fitView({duration:200})}
+        onClick={() => fitView({ duration: 200 })}
       >
-                <FullscreenIcon className="w-5 h-5 foreground-dark" />
-
+        <FullscreenIcon className="w-5 h-5 foreground-dark" />
       </button>
       <button
+        data-testid="maximize"
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => {
           if (
@@ -102,21 +88,21 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
             collapsePanel("config-panel");
           }
           setTimeout(() => {
-            
-            fitView({duration:200})
+            fitView({ duration: 200 });
           }, 100);
         }}
       >
         <Maximize className="w-5 h-5 foreground-dark" />
-
       </button>
       <button
+        data-testid="zoom-out"
         className="bg-[#27282E] hover:bg-primary/20 text-xl text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => zoomOut()}
       >
         -
       </button>
       <button
+        data-testid="zoom-in"
         className="bg-[#27282E] hover:bg-primary/20 text-xl text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => zoomIn()}
       >
@@ -124,6 +110,20 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
       </button>
     </div>
   );
+  
 };
 
 export default CustomControls;
+  // const handleDownload = () => {
+  //   const jsonData = JSON.stringify(state.nodes, null, 2);
+  //   const blob = new Blob([jsonData], { type: "application/json" });
+  //   const url = URL.createObjectURL(blob);
+
+  //   const a = document.createElement("a");
+  //   a.href = url;
+  //   a.download = "data.json";
+  //   document.body.appendChild(a);
+  //   a.click();
+  //   document.body.removeChild(a);
+  //   URL.revokeObjectURL(url);
+  // };

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Octokit } from "@octokit/rest";
 import { RepositoryProvider } from "@/types/repository";
 import { RepositoryBrowserDialog } from "../../../projects/files_viewer/file_viewer";
 import { Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast"; // Assuming Shadcn's toast setup is used
 import { GitHubProjectType } from "@/mongodb/model/github";
 import { AddSubProjectbyId } from "@/actions/projects";
+import OctokitUtils from "@/utils/octokit";
 
 interface GitHubFilePushProps {
   repository: {
@@ -41,7 +41,7 @@ export function GitHubFilePush({
         : `${cleanPath}/${fileName}`;
 
       // Initialize Octokit
-      const octokit = new Octokit({
+      const octokit = new OctokitUtils.Octokit({
         auth: repository.accessToken || undefined,
       });
 
