@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import { useReactFlow } from "@xyflow/react";
 import {
@@ -6,6 +6,7 @@ import {
   FullscreenIcon,
   Maximize,
   X,
+  Blocks,
   SearchIcon,
 } from "lucide-react";
 import { usePanelRefs } from "@/provider/layout_provider";
@@ -14,7 +15,7 @@ import { GitHubFilePush } from "../upload/git/git_push";
 import { RepositoryProvider } from "@/types/repository";
 import { GitHubProjectType } from "@/mongodb/model/github";
 
-const CustomControls = ({project}:{project:GitHubProjectType}) => {
+const CustomControls = ({ project }: { project: GitHubProjectType }) => {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const { getPanelRef, expandPanel, collapsePanel, togglePanel } =
     usePanelRefs();
@@ -60,10 +61,52 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
         data-testid="search"
         className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
         onClick={() => {
-          expandPanel("node-search", 30);
+          console.log(getPanelRef("canvas-sidebar").current,getPanelRef("canvas-sidebar").current?.isCollapsed());
+
+          if(getPanelRef("canvas-sidebar").current?.isCollapsed()){
+            expandPanel("canvas-sidebar",30);
+            expandPanel("node-search",100);
+            collapsePanel("blocks");
+          }
+          else{
+            if(getPanelRef("node-search").current?.isCollapsed()){
+              collapsePanel("blocks");
+              expandPanel("node-search",100);
+            }
+            else {
+              collapsePanel("node-search");
+              collapsePanel("blocks");
+              collapsePanel("canvas-sidebar");
+            }
+          }
         }}
       >
         <SearchIcon className="w-5 h-5 foreground-dark" />
+      </button>
+      <button
+        data-testid="blocks"
+        className="bg-[#27282E] hover:bg-primary/20 text-[#525358] font-bold aspect-square py-1 px-2 w-[36px] rounded"
+        onClick={() => {
+          if(getPanelRef("canvas-sidebar").current?.isCollapsed()){
+            expandPanel("canvas-sidebar",30);
+            expandPanel("blocks",100);
+            collapsePanel("node-search");
+          }
+          else{
+            if(getPanelRef("blocks").current?.isCollapsed()){
+              collapsePanel("node-search");
+              expandPanel("blocks",100);
+            }
+            else {
+              collapsePanel("node-search");
+              collapsePanel("blocks");
+              collapsePanel("canvas-sidebar");
+            }
+            
+          }
+        }}
+      >
+        <Blocks className="w-5 h-5 foreground-dark" />
       </button>
       <button
         data-testid="fit-view"
@@ -110,20 +153,19 @@ const CustomControls = ({project}:{project:GitHubProjectType}) => {
       </button>
     </div>
   );
-  
 };
 
 export default CustomControls;
-  // const handleDownload = () => {
-  //   const jsonData = JSON.stringify(state.nodes, null, 2);
-  //   const blob = new Blob([jsonData], { type: "application/json" });
-  //   const url = URL.createObjectURL(blob);
+// const handleDownload = () => {
+//   const jsonData = JSON.stringify(state.nodes, null, 2);
+//   const blob = new Blob([jsonData], { type: "application/json" });
+//   const url = URL.createObjectURL(blob);
 
-  //   const a = document.createElement("a");
-  //   a.href = url;
-  //   a.download = "data.json";
-  //   document.body.appendChild(a);
-  //   a.click();
-  //   document.body.removeChild(a);
-  //   URL.revokeObjectURL(url);
-  // };
+//   const a = document.createElement("a");
+//   a.href = url;
+//   a.download = "data.json";
+//   document.body.appendChild(a);
+//   a.click();
+//   document.body.removeChild(a);
+//   URL.revokeObjectURL(url);
+// };

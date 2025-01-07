@@ -73,6 +73,7 @@ describe("CustomControls", () => {
 
     expect(screen.getByTestId("toggle-sidebar")).toBeInTheDocument();
     expect(screen.getByTestId("search")).toBeInTheDocument();
+    expect(screen.getByTestId("blocks")).toBeInTheDocument();
     expect(screen.getByTestId("fit-view")).toBeInTheDocument();
     expect(screen.getByTestId("maximize")).toBeInTheDocument();
     expect(screen.getByTestId("zoom-out")).toBeInTheDocument();

@@ -3,7 +3,7 @@ import Header from "@/components/common/header/header";
 import { useEffect, useRef, useState } from "react";
 import CreateConfigDialog from "./create/create_dialog";
 import { useFlow } from "@/provider/canvas_provider";
-import { CustomNodeData } from "../canvas/custome_node";
+import { CustomNodeData } from "../canvas/custom_node";
 
 export default function ConfigComponent() {
   const [open, setOpen] = useState<boolean>(false);
