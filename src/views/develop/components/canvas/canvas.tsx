@@ -12,7 +12,7 @@ import {
   Connection,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import CustomNode from "./custom_node";
+import CustomNode from "./custom_nodes/custom_node";
 import { useFlow } from "@/provider/canvas_provider";
 import ButtonEdge from "./custom_edge/button_edge";
 import CustomControls from "./controls/custom_controls";
@@ -27,6 +27,8 @@ import { usePanelRefs } from "@/provider/layout_provider";
 import { GitHubProjectType } from "@/mongodb/model/github";
 import { Octokit } from "@octokit/rest";
 import Blocks from "./blocks/blocks";
+import CustomSmoothStepEdge from "./custom_edge/smooth_step";
+import CustomEdge from "./custom_edge/button_edge";
 interface FlowNode extends Node {
   data: {
     label: string;
@@ -45,7 +47,8 @@ const nodeTypes: NodeTypes = {
 const edgeTypes = {
   // bidirectional: BiDirectionalEdge,
   // selfconnecting: SelfConnectingEdge,
-  buttonedge: ButtonEdge,
+  buttonedge: CustomSmoothStepEdge,
+  buttonedgebezier: CustomEdge,
 };
 const DevelopCanvas: React.FC<{
   project: GitHubProjectType;
@@ -81,6 +84,7 @@ const DevelopCanvas: React.FC<{
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
+console.log(state,"state");
 
   // Drop handler
   const onDrop = useCallback(
@@ -105,10 +109,12 @@ const DevelopCanvas: React.FC<{
           label: item.label,
           id: item.id,
           type: item.type || "block",
+          variant: item.variant || "default",
           schemaData: {
             label: item.label,
             id: item.id,
             type: item.type || "block",
+            variant: item.variant || "default",
             inputs: {},
             outputs: {},
           },

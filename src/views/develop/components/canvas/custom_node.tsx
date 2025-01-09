@@ -19,23 +19,23 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
     const configs = {
       block: {
         icon: <ChevronRight className="w-6 h-6" />,
-        className: "w-48 min-h-24 rounded-lg",
+        className: "w-40 min-h-20 rounded-lg",
       },
       branch: {
         icon: <Split className="w-6 h-6" />,
-        className: "w-48 min-h-32 rounded-lg",
+        className: "w-40 min-h-20 rounded-lg",
       },
       converge: {
         icon: <Combine className="w-6 h-6" />,
-        className: "w-48 min-h-32 rounded-lg",
+        className: "w-40 min-h-20 rounded-lg",
       },
       simultaneous: {
         icon: <Split className="w-6 h-6 rotate-90" />,
-        className: "w-48 min-h-32 rounded-lg",
+        className: "w-40 min-h-20 rounded-lg",
       },
       loop: {
         icon: <RotateCw className="w-6 h-6" />,
-        className: "w-48 min-h-32 rounded-lg",
+        className: "w-40 min-h-20 rounded-lg",
       },
       start: {
         icon: <Play className="w-6 h-6" />,
@@ -53,7 +53,7 @@ const CustomNode: FC<NodeProps> = ({ data, selected }) => {
   const config = getNodeConfig();
 
   const getNodeStyle = () => {
-    const baseStyles = "relative border-2 flex flex-col items-center justify-center p-4 transition-all duration-200";
+    const baseStyles = "relative border-2 min-h-0 h-20 flex flex-col items-center justify-center p-1 transition-all duration-200";
     const selectedStyles = selected 
       ? "border-primary shadow-lg ring-2 ring-primary/30" 
       : "border-border hover:border-primary/50";

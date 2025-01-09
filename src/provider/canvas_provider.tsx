@@ -7,6 +7,7 @@ import React, {
   useCallback,
   ReactNode,
   Dispatch,
+  useState,
 } from "react";
 import {
   type Node,
@@ -45,13 +46,25 @@ const initialNodes = [
   {
     id: "start", // Unique identifier for the Start node
     type: "custom", // Input type node
-    data: { id:"start",label: "Start",type:"start", value: "Start", icon: <Play className="primary-foreground" /> }, // Label for the node
+    data: {
+      id: "start",
+      label: "Start",
+      type: "start",
+      value: "Start",
+      icon: <Play className="primary-foreground" />,
+    }, // Label for the node
     position: { x: 50, y: 200 }, // Position on the canvas
   },
   {
     id: "end", // Unique identifier for the End node
     type: "custom", // Output type node
-    data: {id:"data", label: "End",type:"end", value: "End", icon: <MonitorStop className="primary-foreground" /> }, // Label for the node
+    data: {
+      id: "data",
+      label: "End",
+      type: "end",
+      value: "End",
+      icon: <MonitorStop className="primary-foreground" />,
+    }, // Label for the node
     position: { x: 1000, y: 200 }, // Position on the canvas
   },
 ];
@@ -64,27 +77,26 @@ const initialState: FlowState = {
   selectedNode: null,
 };
 
-
 const flowReducer = (state: FlowState, action: FlowAction): FlowState => {
   switch (action.type) {
     case "SET_NODES":
       return {
         ...state,
         nodes: action.payload,
-        history: [
-          ...state.history.slice(0, state.currentStep + 1),
-          { nodes: action.payload, edges: state.edges },
-        ],
+        // history: [
+        //   ...state.history.slice(0, state.currentStep + 1),
+        //   { nodes: action.payload, edges: state.edges },
+        // ],
         currentStep: state.currentStep + 1,
       };
     case "SET_EDGES":
       return {
         ...state,
         edges: action.payload,
-        history: [
-          ...state.history.slice(0, state.currentStep + 1),
-          { nodes: state.nodes, edges: action.payload },
-        ],
+        // history: [
+        //   ...state.history.slice(0, state.currentStep + 1),
+        //   { nodes: state.nodes, edges: action.payload },
+        // ],
         currentStep: state.currentStep + 1,
       };
     case "SELECT_NODE":
@@ -120,17 +132,19 @@ const flowReducer = (state: FlowState, action: FlowAction): FlowState => {
 };
 const FlowContext = createContext<{
   state: FlowState;
-  reactFlowProps:ReactFlowInstance<Node, Edge>;
+  reactFlowProps: ReactFlowInstance<Node, Edge>;
   dispatch: Dispatch<FlowAction>;
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
-  getPreviousNodes:(nodeId:string)=>Node[],
+  getPreviousNodes: (nodeId: string) => Node[];
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   deleteNode: (nodeId: string) => void;
-  duplicateNode: (nodeId:string) => void;
+  duplicateNode: (nodeId: string) => void;
   updateNode: (nodeId: string, newData: Partial<Node>) => void;
   onConnect: (connection: Connection) => void;
+  type: any;
+  setType: any;
 } | null>(null);
 interface FlowProviderProps {
   children: ReactNode;
@@ -138,49 +152,71 @@ interface FlowProviderProps {
 
 export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(flowReducer, initialState);
+  const [type, setType] = useState(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(state.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(state.edges);
-  const reactFlowProps = useReactFlow()
+  const reactFlowProps = useReactFlow();
   const onConnect = useCallback(
     (params: Connection) => {
       if (!params.source || !params.target) return;
+      console.log(
+        state.nodes,
+        state?.nodes?.find((n) => n.id === params.source),
+        "wtf"
+      );
 
-      const sourceNode = state.nodes.find((n) => n.id === params.source);
-      const targetNode = state.nodes.find((n) => n.id === params.target);
+      const sourceNode: Node | undefined = state?.nodes?.find(
+        (n) => n.id === params.source
+      );
+      const targetNode: Node | undefined = state?.nodes?.find(
+        (n) => n.id === params.target
+      );
 
       if (params.source === params.target) return;
-
+      console.log(
+        sourceNode,
+        "node wtf",
+        !sourceNode?.data?.variant,
+        "sourceNode?.data?.variant == `default`",sourceNode?.data?.variant == "default"
+      );
       let newEdge: Edge = {
-        id: `${params.source}-${params.target}`,
+        id: `${params.source}${params.sourceHandle}-${params.target}`,
         source: params.source,
         target: params.target,
-        type: "buttonedge",
-        deletable:true,
-        markerEnd:{
+        sourceHandle: params.sourceHandle, // Include sourceHandle
+        type:
+          !sourceNode?.data?.variant || sourceNode?.data?.variant == "default"
+            ? "buttonedge"
+            : "buttonedgebezier",
+        deletable: true,
+
+        markerEnd: {
           type: MarkerType.ArrowClosed,
           width: 20,
           height: 20,
           // color: '#FF0072',
-        }
+        },
       };
 
       if (sourceNode?.data.type === "branch") {
         const existingConnections = state.edges.filter(
-          (edge) => edge.source === params.source
+          (edge) =>
+            edge.source === params.source &&
+            edge.sourceHandle === params.sourceHandle
         );
 
-        if (existingConnections.length >= 2) return;
+        if (existingConnections.length >= 1) return; // Limit to 1 connection per handle
 
         newEdge = {
           ...newEdge,
-          label: existingConnections.length === 0 ? "true" : "false",
+          label: params.sourceHandle == "a" ? "true" : "false",
           animated: false,
           style: {
-            stroke: existingConnections.length === 0 ? "#22c55e" : "#ef4444",
+            stroke: params.sourceHandle == "a" ? "#22c55e" : "#ef4444",
           },
           labelStyle: {
-            fill: existingConnections.length === 0 ? "#22c55e" : "#ef4444",
+            fill: params.sourceHandle == "a" ? "#22c55e" : "#ef4444",
           },
         };
       }
@@ -196,7 +232,9 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
       setEdges((prevEdges) => {
         const connectionExists = prevEdges.some(
           (edge) =>
-            edge.source === params.source && edge.target === params.target
+            edge.source === params.source &&
+            edge.sourceHandle === params.sourceHandle &&
+            edge.target === params.target
         );
         if (connectionExists) return prevEdges;
 
@@ -248,32 +286,36 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
     },
     [state.nodes, setNodes]
   );
-  const getPreviousNodes = (nodeId:string):Node[] => {
-    const userNodes = state.nodes?.filter((ele)=>ele.id !=="start" && ele.id !=="end");
-    if(edges.length==0){
-      const currentIndex = userNodes?.findIndex((ele)=>ele.id==nodeId);
-      if(currentIndex == 0 || currentIndex==-1){
-        return []
+  const getPreviousNodes = (nodeId: string): Node[] => {
+    const userNodes = state.nodes?.filter(
+      (ele) => ele.id !== "start" && ele.id !== "end"
+    );
+    if (edges.length == 0) {
+      const currentIndex = userNodes?.findIndex((ele) => ele.id == nodeId);
+      if (currentIndex == 0 || currentIndex == -1) {
+        return [];
       }
-      return userNodes.slice(currentIndex -1,currentIndex)
+      return userNodes.slice(currentIndex - 1, currentIndex);
     }
 
     // Filter edges where the current node is the target
-    const incomingEdges = state.edges.filter(edge => edge.target === nodeId);
-  
+    const incomingEdges = state.edges.filter((edge) => edge.target === nodeId);
+
     // Get the source IDs from the incoming edges
-    const previousNodeIds = incomingEdges.map(edge => edge.source);
-  
+    const previousNodeIds = incomingEdges.map((edge) => edge.source);
+
     // Map the IDs to actual node objects
-    const previousNodes = userNodes.filter(node => previousNodeIds.includes(node.id));
-    
+    const previousNodes = userNodes.filter((node) =>
+      previousNodeIds.includes(node.id)
+    );
+
     return previousNodes;
   };
 
   const duplicateNode = useCallback(
     (nodeId: string) => {
-      const nodeToDuplicate = state.nodes.find(node => node.id === nodeId);
-      
+      const nodeToDuplicate = state.nodes.find((node) => node.id === nodeId);
+
       if (!nodeToDuplicate) return;
 
       // Generate a unique ID for the new node
@@ -285,17 +327,17 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
         id: newNodeId,
         position: {
           x: nodeToDuplicate.position.x + 100,
-          y: nodeToDuplicate.position.y + 100
+          y: nodeToDuplicate.position.y + 100,
         },
         data: {
           ...nodeToDuplicate.data,
-          label: `${nodeToDuplicate.data.label || 'Node'}`,
-        }
+          label: `${nodeToDuplicate.data.label || "Node"}`,
+        },
       };
 
       // Add the new node to the existing nodes
       const updatedNodes = [...state.nodes, duplicatedNode];
-      
+
       setNodes(updatedNodes);
       dispatch({ type: "SET_NODES", payload: updatedNodes });
 
@@ -307,22 +349,22 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
   const reorderNodes = useCallback(
     (nodeIds: string[]) => {
       // Validate that all provided nodeIds exist
-      const validNodeIds = nodeIds.filter(id => 
-        state.nodes.some(node => node.id === id)
+      const validNodeIds = nodeIds.filter((id) =>
+        state.nodes.some((node) => node.id === id)
       );
 
       // Create a new array of nodes in the specified order
-      const reorderedNodes = validNodeIds.map(id => 
-        state.nodes.find(node => node.id === id)!
+      const reorderedNodes = validNodeIds.map(
+        (id) => state.nodes.find((node) => node.id === id)!
       );
 
       // Add any remaining nodes that weren't in the specified order
       const remainingNodes = state.nodes.filter(
-        node => !validNodeIds.includes(node.id)
+        (node) => !validNodeIds.includes(node.id)
       );
 
       const updatedNodes = [...reorderedNodes, ...remainingNodes];
-      
+
       setNodes(updatedNodes);
       dispatch({ type: "SET_NODES", payload: updatedNodes });
     },
@@ -331,7 +373,7 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
 
   const findNodesByType = useCallback(
     (type: string) => {
-      return state.nodes.filter(node => node.data.type === type);
+      return state.nodes.filter((node) => node.data.type === type);
     },
     [state.nodes]
   );
@@ -339,7 +381,7 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
   const resetFlow = useCallback(() => {
     // Reset to initial state, removing all user-created nodes
     const initialNodes = state.nodes.filter(
-      node => node.id === 'start' || node.id === 'end'
+      (node) => node.id === "start" || node.id === "end"
     );
     const initialEdges: Edge[] = [];
 
@@ -351,8 +393,8 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
 
   const validateFlow = useCallback(() => {
     // Basic flow validation
-    const startNode = state.nodes.find(node => node.id === 'start');
-    const endNode = state.nodes.find(node => node.id === 'end');
+    const startNode = state.nodes.find((node) => node.id === "start");
+    const endNode = state.nodes.find((node) => node.id === "end");
 
     // Check if there's a path from start to end
     const hasValidPath = () => {
@@ -363,7 +405,7 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
 
       while (queue.length > 0) {
         const currentNodeId = queue.shift()!;
-        
+
         if (currentNodeId === endNode.id) return true;
 
         if (visited.has(currentNodeId)) continue;
@@ -371,13 +413,11 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
 
         // Find outgoing edges from current node
         const outgoingEdges = state.edges.filter(
-          edge => edge.source === currentNodeId
+          (edge) => edge.source === currentNodeId
         );
 
         // Add target nodes to queue
-        queue.push(
-          ...outgoingEdges.map(edge => edge.target)
-        );
+        queue.push(...outgoingEdges.map((edge) => edge.target));
       }
 
       return false;
@@ -388,7 +428,7 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
       hasEnd: !!endNode,
       hasValidPath: hasValidPath(),
       nodeCount: state.nodes.length,
-      edgeCount: state.edges.length
+      edgeCount: state.edges.length,
     };
   }, [state.nodes, state.edges]);
 
@@ -406,7 +446,9 @@ export const FlowProvider: React.FC<FlowProviderProps> = ({ children }) => {
         updateNode,
         duplicateNode,
         getPreviousNodes,
-        reactFlowProps
+        reactFlowProps,
+        type,
+        setType,
         // reorderNodes,
         // findNodesByType,
         // resetFlow,
